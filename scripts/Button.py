@@ -5,7 +5,7 @@ import pygame
 
 ## constants
 from config import (
-    PRIMARY_COLOR, ACCENT_COLOR, TEXT_COLOR
+    PRIMARY_COLOR, ACCENT_COLOR, TEXT_COLOR, BLACK, GRAY
 )
 
 ## reusable standardized button class
@@ -36,6 +36,12 @@ class Button:
         pygame.draw.rect(surface=surface,
                          color=self.current_color,
                          rect=self.rect,
+                         border_radius=4)
+        
+        pygame.draw.rect(surface=surface, 
+                         color=BLACK, 
+                         rect=self.rect, 
+                         width=1, 
                          border_radius=4)
     
         # draw text of the button in the center of the "rectangle"

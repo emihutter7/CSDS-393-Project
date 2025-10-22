@@ -28,56 +28,50 @@ current_state = 'MENU'
 running = True
 
 ''' To test the menu things, can change based on other UI elements for the demo'''
-def set_state_to_simulating():
-    global current_state
-    current_state = 'SIMULATING'
-    print("Action: Simulation Started!")
-
-def show_start_menu():
+def show_nrv_menu():
     global menu_manager
     
     # Define the final button actions for the menu
-    def confirm_start():
-        set_state_to_simulating()
-        
+    def confirm_upgrade():
+        print("placeholder handler")
+
     def cancel_action():
         print("Action: Start cancelled by user.")
 
-    start_menu = Menu(
+    nrv_menu = Menu(
         menu_manager=menu_manager,
-        title="Confirm Simulation Start",
-        text="Starting the simulation will clear any current progress and launch the environment. Do you wish to proceed?",
+        title="North Residential Village Dorms",
+        text="You can upgrade the building from 1 to 2. Do you wish to proceed?",
         user_options=[
-            ("PROCEED", confirm_start),
+            ("PROCEED", confirm_upgrade),
             ("CANCEL", cancel_action)
         ],
-        user_closable=True # Allows the user to close via the 'X' button
+        user_closable=True
     )
-    # Activate the menu
-    menu_manager.open_menu(start_menu)
+    menu_manager.open_menu(nrv_menu)
     
-def show_settings_menu():
+def show_ksl_menu():
     global menu_manager
     
-    def apply_settings():
+    def ksl_actions():
         print("placeholder_callback")
         
-    settings_menu = Menu(
+    ksl_menu = Menu(
         menu_manager=menu_manager,
         title="Building Menu",
         text="Adjust visual and simulation options",
         user_options=[
-            ("APPLY", apply_settings),
+            ("APPLY", ksl_actions),
             ("CLOSE", lambda: print("Settings closed.")) 
         ],
         user_closable=True
     )
-    menu_manager.open_menu(settings_menu)
+    menu_manager.open_menu(ksl_menu)
 
 # set up the main menu
 main_menu_data = [
-    ("START SIMULATION", show_start_menu, (500, 300, 120, 40)),
-    ("SETTINGS", show_settings_menu, (500, 500, 200, 50)),
+    ("NRV Dorms", show_nrv_menu, (500, 400, 200, 200)),
+    ("KSL", show_ksl_menu, (500, 10, 400, 200)), 
 ]
 
 menu_manager = MenuManager(main_data=main_menu_data)
@@ -95,7 +89,7 @@ def main():
                 menu_manager.handle_event(event)
             
             # can change later
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and current_state == 'SIMULATING':
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: #and current_state == 'SIMULATING'
                     current_state = 'MENU'
                     print("Transitioning back to MENU state.")
         
@@ -120,17 +114,8 @@ def main():
         WINDOW.blit(SYS_FONT.render("Metrics", True, BLACK), (1010, 10))
 
         if current_state == 'MENU':
-
             menu_manager.draw(WINDOW)
             
-        elif current_state == 'SIMULATING':
-            # Simulation drawing logic will go here
-            font_sim = pygame.font.Font(None, 24)
-            sim_text = font_sim.render("SIMULATION ACTIVE (Press SPACE to return)", True, BLACK)
-            sim_rect = sim_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
-            WINDOW.blit(sim_text, sim_rect)
-
-
         pygame.display.update()
 
     pygame.quit()
