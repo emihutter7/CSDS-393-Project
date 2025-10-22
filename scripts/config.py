@@ -1,6 +1,6 @@
 # Screen Dimensions
-SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 700
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 700
 
 # Colors (RGB)
 BG_COLOR = (240, 240, 240)  # Dark Gray

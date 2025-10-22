@@ -5,7 +5,7 @@ import pygame
 
 ## constants
 from config import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, PRIMARY_COLOR, ACCENT_COLOR, TEXT_COLOR, GRAY, BLACK, BG_COLOR, WHITE
+    WINDOW_WIDTH, WINDOW_HEIGHT, PRIMARY_COLOR, ACCENT_COLOR, TEXT_COLOR, GRAY, BLACK, BG_COLOR, WHITE
 )
 from Button import Button
 
@@ -38,8 +38,8 @@ class Menu:
         # define the geometry for the menu
         self.width = 500
         self.height = 400
-        self.x = (SCREEN_WIDTH - self.width) // 2 # so that the menu is centered
-        self.y = (SCREEN_HEIGHT - self.height) // 2
+        self.x = (WINDOW_WIDTH - self.width) // 2 # so that the menu is centered
+        self.y = (WINDOW_HEIGHT - self.height) // 2
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         self._menu_setup() # call the protected helper function to organize the menu interface
@@ -126,7 +126,7 @@ class Menu:
     def draw(self, surface):
         
         # dim the main window
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 150)) ## DONT HARD CODE FIXME
         surface.blit(overlay, (0, 0))
 
@@ -196,14 +196,14 @@ class MenuManager:
                 # default center position
                 text, callback = entry
                 width, height = default_w, default_h
-                x = (SCREEN_WIDTH - width) // 2
+                x = (WINDOW_WIDTH - width) // 2
                 y = current_y
             elif len(entry) == 3:
                 text, callback, dims = entry
                 if len(dims) == 2:
                     # only width, height provided
                     width, height = dims
-                    x = (SCREEN_WIDTH - width) // 2
+                    x = (WINDOW_WIDTH - width) // 2
                     y = current_y
                 elif len(dims) == 4:
                     # full x, y, w, h provided
