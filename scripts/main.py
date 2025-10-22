@@ -64,12 +64,18 @@ def show_settings_menu():
         
     settings_menu = Menu(
         menu_manager=menu_manager,
-        title="Settings Menu",
+        title="Building Menu",
         text="Adjust visual and simulation options",
         user_options=[
             ("APPLY", apply_settings),
             ("CLOSE", lambda: print("Settings closed.")) 
         ],
+        button_dimensions={
+        "width": 500,
+        "height": 200,
+        "spacing": 20,
+        "bottom_offset": 20
+        },
         user_closable=True
     )
     menu_manager.open_menu(settings_menu)

@@ -11,7 +11,7 @@ from Button import Button
 
 ## menu class for all popups and buttons
 class Menu:
-    def __init__(self, menu_manager, title, text, user_options, user_closable=False):
+    def __init__(self, menu_manager, title, text, user_options, button_dimensions=None, user_closable=False):
 
         self.menu_manager = menu_manager
         self.title = title
@@ -21,6 +21,16 @@ class Menu:
         self.buttons = []
         self.close_button = None
         
+        # default button layout if user doesn't specify
+        default_button_dimensions = {
+            "width": 200,
+            "height": 40,
+            "spacing": 20,
+            "button_offset" : 70
+        }
+        # merge defaults with user-specified values
+        self.button_dimensions = {**default_button_dimensions, **(button_dimensions or {})}
+
         self.title_font = pygame.font.Font(None, 40)
         self.text_font = pygame.font.Font(None, 24)
         self.button_text_font = pygame.font.Font(None, 30)
@@ -46,15 +56,15 @@ class Menu:
     
     def _menu_setup(self):
 
-        # DONT HARD CODE FIXME
-        button_width = 200
-        button_height = 40
-        spacing = 20
+        button_width = self.button_dimensions["width"]
+        button_height = self.button_dimensions["height"]
+        spacing = self.button_dimensions["spacing"]
+        button_offset = self.button_dimensions["button_offset"]
 
         # calculate how to center the buttons
         starting_x_pos = self.x + (self.width - (button_width * len(self.user_options)) + (spacing * (len(self.user_options) - 1))) // 2
 
-        button_y = self.y + self.height - 70 # DONT HARD CODE FIXME
+        button_y = self.y + self.height - button_offset
 
         # create the buttons for all the ones listed for the menu
         for i, (button_text, callback) in enumerate(self.user_options):
