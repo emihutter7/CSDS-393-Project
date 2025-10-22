@@ -1,5 +1,5 @@
 import pytest
-from MetricsClass import Metrics  # assuming your file is metrics.py
+from scripts.MetricsClass import Metrics
 
 @pytest.fixture
 def m():
@@ -34,7 +34,7 @@ def test_security(m):
     assert m.security == 45
 
 def test_academics(m):
-    m.academics = m.academics + m.academics + 5
+    m.academics = m.academics + 5
     assert m.academics == 85
 
 @pytest.mark.parametrize("attr", [
