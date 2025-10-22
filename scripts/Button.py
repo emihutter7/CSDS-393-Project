@@ -19,7 +19,7 @@ class Button:
         
         self.rect = pygame.Rect(dimensions)
         self.text = text
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font(None, 20)
         self.callback = callback
         self.base_color = base_color
         self.hover_color = hover_color

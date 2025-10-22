@@ -60,7 +60,7 @@ def show_settings_menu():
     global menu_manager
     
     def apply_settings():
-        print("placeholder")
+        print("placeholder_callback")
         
     settings_menu = Menu(
         menu_manager=menu_manager,
@@ -70,23 +70,17 @@ def show_settings_menu():
             ("APPLY", apply_settings),
             ("CLOSE", lambda: print("Settings closed.")) 
         ],
-        button_dimensions={
-        "width": 500,
-        "height": 200,
-        "spacing": 20,
-        "bottom_offset": 20
-        },
         user_closable=True
     )
     menu_manager.open_menu(settings_menu)
 
 # set up the main menu
 main_menu_data = [
-    ("START SIMULATION", show_start_menu),
-    ("SETTINGS", show_settings_menu),
+    ("START SIMULATION", show_start_menu, (500, 300, 120, 40)),
+    ("SETTINGS", show_settings_menu, (500, 500, 200, 50)),
 ]
 
-menu_manager = MenuManager(main_menu_data)
+menu_manager = MenuManager(main_data=main_menu_data)
 
 def main():
     global current_state, running

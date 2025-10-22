@@ -185,26 +185,47 @@ class MenuManager:
 
     def _main_setup(self, data):
 
-        ## values hard coded for now FIXME
-        button_width = 250
-        button_height = 60
-        start_y = 150
+        default_w, default_h = 250, 60
+        default_start_y = 150
         spacing = 20
+        current_y = default_start_y
 
-        # its callbacks should be the menu showing
-        for i, (text, callback) in enumerate(data):
-            rect = ((SCREEN_WIDTH - button_width) // 2, 
-                    start_y + (i * (button_height + spacing)), 
-                    button_width, 
-                    button_height)
-            
-            button = Button(dimensions=rect, 
-                            text=text, 
-                            callback=callback, 
-                            base_color=PRIMARY_COLOR, 
-                            hover_color=ACCENT_COLOR)
-            
+        for entry in data:
+
+            if len(entry) == 2:
+                # default center position
+                text, callback = entry
+                width, height = default_w, default_h
+                x = (SCREEN_WIDTH - width) // 2
+                y = current_y
+            elif len(entry) == 3:
+                text, callback, dims = entry
+                if len(dims) == 2:
+                    # only width, height provided
+                    width, height = dims
+                    x = (SCREEN_WIDTH - width) // 2
+                    y = current_y
+                elif len(dims) == 4:
+                    # full x, y, w, h provided
+                    x, y, width, height = dims
+                else:
+                    raise ValueError("Button dimensions must be (w, h) or (x, y, w, h)")
+            else:
+                raise ValueError("Each entry must be (text, callback), (text, callback, (w, h)), or (text, callback, (x, y, w, h))")
+
+            rect = (x, y, width, height)
+            button = Button(
+                dimensions=rect,
+                text=text,
+                callback=callback,
+                base_color=PRIMARY_COLOR,
+                hover_color=ACCENT_COLOR
+            )
             self.main_buttons.append(button)
+
+            # only stack automatically when no explicit y provided
+            if len(entry) < 3 or len(entry[2]) < 4:
+                current_y += height + spacing
 
     def open_menu(self, menu):
 
