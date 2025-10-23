@@ -1,13 +1,11 @@
 ## imports
-import numpy as np
-import sys
 import pygame
 
 ## constants
-from config import (
+from .config import (
     WINDOW_WIDTH, WINDOW_HEIGHT, PRIMARY_COLOR, ACCENT_COLOR, TEXT_COLOR, GRAY, BLACK, BG_COLOR, WHITE
 )
-from Button import Button
+from .Button import Button
 
 ## menu class for all popups and buttons
 class Menu:

@@ -1,9 +1,8 @@
 ## imports
-import numpy as np
 import sys
 import pygame
-from menu import MenuManager, Menu 
-from agentsClass import Student, Admin, Player
+from .menu import MenuManager, Menu 
+from .agentsClass import Student, Admin, Player
 import random
 
 pygame.init()
@@ -16,24 +15,24 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 STEEL_BLUE = (70, 130, 180)  # Steel Blue
-
-WINDOW_HEIGHT = 700
+WINDOW_HEIGHT = 830
 WINDOW_WIDTH = 1200
 WINDOW_SIZE = (1200, 830) # set an arbitrary value, fix later
 WINDOW_TITLE = "Kaler Simulator"
-
-pygame.display.set_caption(WINDOW_TITLE)
-
-WINDOW = pygame.display.set_mode(WINDOW_SIZE)
 SYS_FONT = pygame.font.SysFont(None, 24)
+
+# setup the original game state
+pygame.display.set_caption(WINDOW_TITLE)
+WINDOW = pygame.display.set_mode(WINDOW_SIZE)
 current_state = 'MENU'
 running = True
 
-''' To test the menu things, can change based on other UI elements for the demo'''
+# To test the menu, can change based on other UI elements
+
+# nrv menu
 def show_nrv_menu():
     global menu_manager
     
-    # Define the final button actions for the menu
     def confirm_upgrade():
         print("placeholder handler")
 
@@ -52,6 +51,7 @@ def show_nrv_menu():
     )
     menu_manager.open_menu(nrv_menu)
 
+# leutner menu
 def show_leut_menu():
     global menu_manager
     
@@ -70,6 +70,7 @@ def show_leut_menu():
     )
     menu_manager.open_menu(leut_menu)
 
+# ksl menu
 def show_ksl_menu():
     global menu_manager
     
@@ -88,6 +89,7 @@ def show_ksl_menu():
     )
     menu_manager.open_menu(ksl_menu)
 
+# wyant menu
 def show_wyant_menu():
     global menu_manager
     
@@ -106,6 +108,7 @@ def show_wyant_menu():
     )
     menu_manager.open_menu(wyant_menu)
 
+# pbl menu
 def show_pbl_menu():
     global menu_manager
     
@@ -124,6 +127,7 @@ def show_pbl_menu():
     )
     menu_manager.open_menu(pbl_menu)
 
+# tink menu
 def show_tink_menu():
     global menu_manager
     
@@ -142,6 +146,7 @@ def show_tink_menu():
     )
     menu_manager.open_menu(tink_menu) 
 
+# thwing menu
 def show_thwing_menu():
     global menu_manager
     
@@ -160,6 +165,7 @@ def show_thwing_menu():
     )
     menu_manager.open_menu(thwing_menu)
 
+# srv menu
 def show_srv_menu():
     global menu_manager
     
@@ -178,6 +184,7 @@ def show_srv_menu():
     )
     menu_manager.open_menu(srv_menu)
 
+# ford menu
 def show_ford_menu():
     global menu_manager
     
@@ -196,6 +203,7 @@ def show_ford_menu():
     )
     menu_manager.open_menu(ford_menu)
 
+# frib menu
 def show_frib_menu():
     global menu_manager
     
@@ -214,6 +222,7 @@ def show_frib_menu():
     )
     menu_manager.open_menu(frib_menu)
 
+# veale menu
 def show_veale_menu():
     global menu_manager
     
@@ -232,6 +241,7 @@ def show_veale_menu():
     )
     menu_manager.open_menu(veale_menu)
 
+# glennan menu
 def show_glen_menu():
     global menu_manager
     
@@ -250,6 +260,7 @@ def show_glen_menu():
     )
     menu_manager.open_menu(glen_menu)
 
+# white menu
 def show_white_menu():
     global menu_manager
     
@@ -268,6 +279,7 @@ def show_white_menu():
     )
     menu_manager.open_menu(white_menu)
 
+# olin menu
 def show_olin_menu():
     global menu_manager
     
@@ -286,6 +298,7 @@ def show_olin_menu():
     )
     menu_manager.open_menu(olin_menu)
 
+# nord menu
 def show_nord_menu():
     global menu_manager
     
@@ -304,6 +317,7 @@ def show_nord_menu():
     )
     menu_manager.open_menu(nord_menu)
 
+# sears menu
 def show_sears_menu():
     global menu_manager
     
@@ -322,6 +336,7 @@ def show_sears_menu():
     )
     menu_manager.open_menu(sears_menu)
 
+# wickenden menu
 def show_wick_menu():
     global menu_manager
     
@@ -340,6 +355,7 @@ def show_wick_menu():
     )
     menu_manager.open_menu(wick_menu)
 
+# iseb menu
 def show_iseb_menu():
     global menu_manager
     
@@ -358,6 +374,7 @@ def show_iseb_menu():
     )
     menu_manager.open_menu(iseb_menu)
 
+# tomlinson menu
 def show_tmlsn_menu():
     global menu_manager
     
@@ -376,6 +393,7 @@ def show_tmlsn_menu():
     )
     menu_manager.open_menu(tm_menu)
 
+# crawford menu
 def show_crwfrd_menu():
     global menu_manager
     
@@ -394,6 +412,7 @@ def show_crwfrd_menu():
     )
     menu_manager.open_menu(craw_menu)
 
+# adelbert menu
 def show_adlbrt_menu():
     global menu_manager
     
@@ -412,6 +431,7 @@ def show_adlbrt_menu():
     )
     menu_manager.open_menu(bert_menu)
 
+# rockefeller
 def show_rockflr_menu():
     global menu_manager
     
@@ -430,6 +450,7 @@ def show_rockflr_menu():
     )
     menu_manager.open_menu(rock_menu)
 
+# strosacker menu
 def show_strskr_menu():
     global menu_manager
     
@@ -448,6 +469,7 @@ def show_strskr_menu():
     )
     menu_manager.open_menu(stro_menu)
 
+# aw smith menu
 def show_smith_menu():
     global menu_manager
     
@@ -466,6 +488,7 @@ def show_smith_menu():
     )
     menu_manager.open_menu(smith_menu)
 
+# binghm menu
 def show_bghm_menu():
     global menu_manager
     
@@ -484,6 +507,7 @@ def show_bghm_menu():
     )
     menu_manager.open_menu(bing_menu)
 
+# schmitt menu
 def show_schmitt_menu():
     global menu_manager
     
@@ -502,6 +526,7 @@ def show_schmitt_menu():
     )
     menu_manager.open_menu(schmitt_menu)
 
+# keep track of input for triggering event
 def check_input(key, value):
     if key == pygame.K_LEFT:
         player_input["left"] = value or key == pygame.K_a
@@ -548,16 +573,17 @@ main_menu_data = [
 ]
 menu_manager = MenuManager(main_data=main_menu_data)
 
-# All agents start at x=600 and move vertically between y=200 and y=500
+# all agents start at x=600 and move vertically between y=200 and y=500
 students = [Student(600, random.randint(10, 800), (0, 255, 0), speed=0.05, path_end=(600, 830)) for _ in range(4)]
 
 admins = [Admin(600, random.randint(10, 800), (0, 0, 0), speed=0.05, path_end=(600, 800)) for _ in range(2)]
 
-
+# main game loop
 def main():
     global current_state, running, player_x, player_y, player_input, player_velocity, students, admins
     while running:
 
+        # handle all the events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -575,15 +601,13 @@ def main():
                 check_input(event.key, True)
             if event.type == pygame.KEYUP:
                 check_input(event.key, False)
-        
-
 
         WINDOW.fill(GRAY)
 
-        # Create player
+        # create player
         player = Player(200, 300)
 
-        # All agents start at x=600 and move vertically between y=200 and y=500
+        # all agents start at x=600 and move vertically between y=200 and y=500
         students = [Student(600, random.randint(10, 800), (0, 255, 0), speed=0.05, path_end=(600, 830)) for _ in range(4)]
 
         admins = [Admin(600, random.randint(10, 800), (0, 0, 0), speed=0.01, path_end=(600, 800)) for _ in range(2)]
@@ -594,7 +618,7 @@ def main():
         player_x += player_velocity[0] * 5
         player_y += player_velocity[1] * 5
 
-        # Move & draw AI agents
+        # move & draw AI agents
         for s in students:
             s.move_along_path()
             s.draw(WINDOW)
@@ -612,13 +636,13 @@ def main():
         pygame.draw.rect(WINDOW, BLACK, (0, 100, WINDOW_WIDTH // 6, 500), width=3)
         WINDOW.blit(SYS_FONT.render("Tasks", True, BLACK), (10, 110))
 
-        pygame.draw.rect(WINDOW, STEEL_BLUE, (0, 600, WINDOW_WIDTH // 6, 200))
-        pygame.draw.rect(WINDOW, BLACK, (0, 600, WINDOW_WIDTH // 6, 200), width=3)
+        pygame.draw.rect(WINDOW, STEEL_BLUE, (0, 600, WINDOW_WIDTH // 6, 230))
+        pygame.draw.rect(WINDOW, BLACK, (0, 600, WINDOW_WIDTH // 6, 230), width=3)
         WINDOW.blit(SYS_FONT.render("Semester", True, BLACK), (10, 610))
 
         # right panels
-        pygame.draw.rect(WINDOW, STEEL_BLUE, (1000, 0, WINDOW_WIDTH - WINDOW_WIDTH // 6, 700))
-        pygame.draw.rect(WINDOW, BLACK, (1000, 0, WINDOW_WIDTH - WINDOW_WIDTH // 6, 700), width=3)
+        pygame.draw.rect(WINDOW, STEEL_BLUE, (1000, 0, WINDOW_WIDTH - WINDOW_WIDTH // 6, 830))
+        pygame.draw.rect(WINDOW, BLACK, (1000, 0, WINDOW_WIDTH - WINDOW_WIDTH // 6, 830), width=3)
         WINDOW.blit(SYS_FONT.render("Metrics", True, BLACK), (1010, 10))
 
         if current_state == 'MENU':

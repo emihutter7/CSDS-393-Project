@@ -1,10 +1,8 @@
 ## imports
-import numpy as np
-import sys
 import pygame
 
 ## constants
-from config import (
+from .config import (
     PRIMARY_COLOR, ACCENT_COLOR, TEXT_COLOR, BLACK, GRAY
 )
 
