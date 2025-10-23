@@ -1,6 +1,6 @@
 import pytest
 from scripts.MetricsClass import Metrics
-from scripts.PopupEvents import PopupEvent, PopupChoice, minor_events, major_events, AdjustMetricsTask
+from scripts.Popups import PopupEvent, PopupChoice, minor_events, major_events, AdjustMetricsTask
 
 @pytest.fixture
 def m():
