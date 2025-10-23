@@ -171,7 +171,7 @@ def show_srv_menu():
         title="Building Menu",
         text="Adjust visual and simulation options",
         user_options=[
-            ("APPLY", ksl_actions),
+            ("APPLY", srv_actions),
             ("CLOSE", lambda: print("Settings closed.")) 
         ],
         user_closable=True
@@ -217,7 +217,7 @@ def show_frib_menu():
 def show_veale_menu():
     global menu_manager
     
-    def ksl_actions():
+    def veale_actions():
         print("placeholder_callback")
         
     veale_menu = Menu(
