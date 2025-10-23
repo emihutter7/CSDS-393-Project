@@ -3,6 +3,8 @@ import numpy as np
 import sys
 import pygame
 from menu import MenuManager, Menu 
+from agentsClass import Student, Admin, Player
+import random
 
 pygame.init()
 
@@ -500,6 +502,21 @@ def show_schmitt_menu():
     )
     menu_manager.open_menu(schmitt_menu)
 
+def check_input(key, value):
+    if key == pygame.K_LEFT:
+        player_input["left"] = value or key == pygame.K_a
+    elif key == pygame.K_RIGHT:
+        player_input["right"] = value or key == pygame.K_d
+    elif key == pygame.K_UP:
+        player_input["up"] = value or key == pygame.K_w
+    elif key == pygame.K_DOWN:
+        player_input["down"] = value or key == pygame.K_s
+
+player_x = 0 # initial x position of player
+player_y = 0 # initial x position of player
+player_input = {"left": False, "right": False, "up": False, "down": False, "select": False}
+player_velocity = [0, 0] # [x, y] how much player changes
+
 # set up the main menu
 main_menu_data = [
     ("NRV Dorms", show_nrv_menu, (370, 120, 80, 80)),
@@ -531,8 +548,14 @@ main_menu_data = [
 ]
 menu_manager = MenuManager(main_data=main_menu_data)
 
+# All agents start at x=600 and move vertically between y=200 and y=500
+students = [Student(600, random.randint(10, 800), (0, 255, 0), speed=0.05, path_end=(600, 830)) for _ in range(4)]
+
+admins = [Admin(600, random.randint(10, 800), (0, 0, 0), speed=0.05, path_end=(600, 800)) for _ in range(2)]
+
+
 def main():
-    global current_state, running
+    global current_state, running, player_x, player_y, player_input, player_velocity, students, admins
     while running:
 
         for event in pygame.event.get():
@@ -547,8 +570,38 @@ def main():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: #and current_state == 'SIMULATING'
                     current_state = 'MENU'
                     print("Transitioning back to MENU state.")
+            
+            if event.type == pygame.KEYDOWN:
+                check_input(event.key, True)
+            if event.type == pygame.KEYUP:
+                check_input(event.key, False)
         
+
+
         WINDOW.fill(GRAY)
+
+        # Create player
+        player = Player(200, 300)
+
+        # All agents start at x=600 and move vertically between y=200 and y=500
+        students = [Student(600, random.randint(10, 800), (0, 255, 0), speed=0.05, path_end=(600, 830)) for _ in range(4)]
+
+        admins = [Admin(600, random.randint(10, 800), (0, 0, 0), speed=0.01, path_end=(600, 800)) for _ in range(2)]
+
+        player_velocity[0] = player_input['right'] - player_input['left'] # velocity in X direction. If right is true then 1 - 0 = 1, if left is tru thenn 0 - 1 = -1
+        player_velocity[1] = player_input['up'] - player_input['down'] # velocity in Y direction. If up is true then 1 - 0 = 1, if downn is tru thenn 0 - 1 = -1
+
+        player_x += player_velocity[0] * 5
+        player_y += player_velocity[1] * 5
+
+        # Move & draw AI agents
+        for s in students:
+            s.move_along_path()
+            s.draw(WINDOW)
+
+        for a in admins:
+            a.move_along_path()
+            a.draw(WINDOW)
 
         # left panels
         pygame.draw.rect(WINDOW, STEEL_BLUE, (0, 0, WINDOW_WIDTH // 6, 100))
