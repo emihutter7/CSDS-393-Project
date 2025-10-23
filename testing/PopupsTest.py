@@ -62,5 +62,5 @@ def test_snowstorm_event_choice_one(m):
     # Verify that metrics changed exactly as expected
     assert m.budget == start_budget - 2000000
     assert m.sHappiness == start_shappy + 10
-    assert m.aHappiness == start_shappy + 10
+    assert m.aHappiness == start_ahappy + 10
     assert m.security == start_security + 5

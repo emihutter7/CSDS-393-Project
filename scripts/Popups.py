@@ -1,4 +1,4 @@
-from MetricsClass import Metrics
+from scripts.MetricsClass import Metrics
 
 # applies metric changes
 class AdjustMetricsTask:
@@ -59,7 +59,7 @@ minor_events = [
         "minor",
         [
             PopupChoice("Fund extra plowing crews", {"budget": -2000000, "sHappiness": +10, "aHappiness": +10, "security": +5}),
-            PopupChoice("Maintain current funding", {"sHappiness": -5, "aHappiness": -10, +"security": -5}),
+            PopupChoice("Maintain current funding", {"sHappiness": -5, "aHappiness": -10, "security": -5}),
             PopupChoice("Cut maintenance budget", {"budget": +1000000, "sHappiness": -6, "security": -5})
         ]
     ),
