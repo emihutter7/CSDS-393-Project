@@ -179,9 +179,17 @@ class MenuManager:
         self.main_buttons = []
         self.active_menu = None
         
-        self._main_setup(main_data)
+        self.main_setup(main_data)
 
-    def _main_setup(self, data):
+    def main_setup(self, data):
+        """
+        Each entry in 'data' can be one of the following:
+        (text, callback)
+        (text, callback, (w, h))
+        (text, callback, (x, y, w, h))
+        (text, callback, (x, y, w, h), image_path)
+        (None, callback, (x, y, w, h), image_path)  # image-only button
+        """
 
         default_w, default_h = 250, 60
         default_start_y = 150
@@ -190,34 +198,38 @@ class MenuManager:
 
         for entry in data:
 
-            if len(entry) == 2:
-                # default center position
-                text, callback = entry
+            text = entry[0]
+            callback = entry[1]
+            dims = None
+            image_path = None
+
+            if len(entry) >= 3:
+                dims = entry[2]
+            if len(entry) == 4:
+                image_path = entry[3]
+
+            if dims is None:
                 width, height = default_w, default_h
                 x = (WINDOW_WIDTH - width) // 2
                 y = current_y
-            elif len(entry) == 3:
-                text, callback, dims = entry
-                if len(dims) == 2:
-                    # only width, height provided
-                    width, height = dims
-                    x = (WINDOW_WIDTH - width) // 2
-                    y = current_y
-                elif len(dims) == 4:
-                    # full x, y, w, h provided
-                    x, y, width, height = dims
-                else:
-                    raise ValueError("Button dimensions must be (w, h) or (x, y, w, h)")
+            elif len(dims) == 2:
+                width, height = dims
+                x = (WINDOW_WIDTH - width) // 2
+                y = current_y
+            elif len(dims) == 4:
+                x, y, width, height = dims
             else:
-                raise ValueError("Each entry must be (text, callback), (text, callback, (w, h)), or (text, callback, (x, y, w, h))")
+                raise ValueError("Button dimensions must be (w, h) or (x, y, w, h)")
 
             rect = (x, y, width, height)
+
             button = Button(
                 dimensions=rect,
                 text=text,
                 callback=callback,
                 base_color=PRIMARY_COLOR,
-                hover_color=ACCENT_COLOR
+                hover_color=ACCENT_COLOR,
+                image_path=image_path
             )
             self.main_buttons.append(button)
 
