@@ -103,8 +103,6 @@ class MainGameMenu():
 # FIXME for building logic - we need to have a building class that can have a dictionary with building name as key and level #, need an upgrade building function
 class StartGame():
     def __init__(self, screen, font, gameStateManager):
-        #metrics initializing
-        self.metrics = Metrics()
 
         # general game logic
         self.menu_manager = MenuManager(main_data=[])
@@ -170,11 +168,20 @@ class StartGame():
         self.player_input = {"left": False, "right": False, "up": False, "down": False, "select": False}
         self.player_x = 0
         self.player_y = 0
+
+        #metrics initializing
+        self.metrics = Metrics()
+        self.generate_tasks()
     
     # FIXME need some way to make sure that it notifies user that you can't use it if task is not empty
     """ def next_sem(self):
         if self.semester < 8 and len(self.tasks) == 0:
             self.semester += 1 """
+    
+    def next_sem(self):
+        if len(self.tasks) == 0:
+            self.semester += 1
+            self.generate_tasks()
 
     # generic building menu
     def show_building_menu(self, building_name):
@@ -237,6 +244,7 @@ class StartGame():
         py.draw.rect(self.screen, PANEL_COLOR, (metrics_panel_x, 70, self.panel_width, WINDOW_HEIGHT - 70))
         py.draw.rect(self.screen, BORDER_COLOR, (metrics_panel_x, 70, self.panel_width, WINDOW_HEIGHT - 70), width=3)
         self.screen.blit(self.font.render("Metrics", True, TEXT_COLOR), (metrics_panel_x + 15, 80))
+        
 
         # event handling logic
         for event in py.event.get():
