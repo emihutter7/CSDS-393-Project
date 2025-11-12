@@ -169,9 +169,14 @@ class StartGame():
         self.player_x = 0
         self.player_y = 0
 
+        # currently no popup open, will store temporary popup choice buttons
+        self.active_popup = None       
+        self.choice_buttons = []
+
         #metrics initializing
         self.metrics = Metrics()
         self.generate_tasks()
+        
     
     # FIXME need some way to make sure that it notifies user that you can't use it if task is not empty
     """ def next_sem(self):
@@ -271,6 +276,13 @@ class StartGame():
             self.menu_manager.handle_event(event)
             self.help_button.handle_event(event)
             self.next_semester_button.handle_event(event)
+            for btn in self.tasks:
+                btn.handle_event(event)
+            # handle popup choice button clicks when popup open
+            if self.active_popup:
+                for btn in self.choice_buttons:
+                    btn.handle_event(event)
+            
 
         # agents logic
         self.students = [Student(600, random.randint(10, 800), (0, 255, 0), speed=0.05, path_end=(600, 830)) for _ in range(4)]
@@ -299,6 +311,9 @@ class StartGame():
         #draw task buttons
         for btn in self.tasks:
             btn.draw(self.screen)
+        
+        if self.active_popup:
+            self.draw_popup()
 
     def generate_tasks(self):
         # clear old tasks
@@ -322,44 +337,44 @@ class StartGame():
             self.tasks.append(btn)
             y_offset += 60
 
-def open_popup(self, event):
-    self.active_popup = event
+    def open_popup(self, event):
+        self.active_popup = event
 
-def draw_popup(self):
-    popup = self.active_popup
-    if not popup:
-        return
-    rect = py.Rect(WINDOW_WIDTH//2 - 300, WINDOW_HEIGHT//2 - 200, 600, 400)
-    py.draw.rect(self.screen, PANEL_COLOR, rect)
-    py.draw.rect(self.screen, BORDER_COLOR, rect, 3)
+    def draw_popup(self):
+        popup = self.active_popup
+        if not popup:
+            return
+        rect = py.Rect(WINDOW_WIDTH//2 - 300, WINDOW_HEIGHT//2 - 200, 600, 400)
+        py.draw.rect(self.screen, PANEL_COLOR, rect)
+        py.draw.rect(self.screen, BORDER_COLOR, rect, 3)
 
-    # draw title & description
-    title_surf = self.font.render(popup.title, True, TEXT_COLOR)
-    desc_surf = self.font.render(popup.description, True, TEXT_COLOR)
-    self.screen.blit(title_surf, (rect.x + 20, rect.y + 20))
-    self.screen.blit(desc_surf, (rect.x + 20, rect.y + 60))
+        # draw title & description
+        title_surf = self.font.render(popup.title, True, TEXT_COLOR)
+        desc_surf = self.font.render(popup.description, True, TEXT_COLOR)
+        self.screen.blit(title_surf, (rect.x + 20, rect.y + 20))
+        self.screen.blit(desc_surf, (rect.x + 20, rect.y + 60))
 
-    # draw choices as buttons
-    self.choice_buttons = []
-    y = rect.y + 120
-    for i, choice in enumerate(popup.choices):
-        btn = Button(
-            dimensions=(rect.x + 100, y, 400, 40),
-            text=choice.text,
-            callback=lambda idx=i: self.choose_option(idx),
-            base_color=BUTTON_COLOR,
-            hover_color=BUTTON_HOVER,
-            text_color=TEXT_COLOR
-        )
-        btn.draw(self.screen)
-        self.choice_buttons.append(btn)
-        y += 60
+        # draw choices as buttons
+        self.choice_buttons = []
+        y = rect.y + 120
+        for i, choice in enumerate(popup.choices):
+            btn = Button(
+                dimensions=(rect.x + 100, y, 400, 40),
+                text=choice.text,
+                callback=lambda idx=i: self.choose_option(idx),
+                base_color=BUTTON_COLOR,
+                hover_color=BUTTON_HOVER,
+                text_color=TEXT_COLOR
+            )
+            btn.draw(self.screen)
+            self.choice_buttons.append(btn)
+            y += 60
 
-def choose_option(self, idx):
-    self.active_popup.trigger_choice(idx, self.metrics)
-    # remove this task from task list
-    self.tasks = [t for t in self.tasks if t.text != self.active_popup.title]
-    self.active_popup = None
+    def choose_option(self, idx):
+        self.active_popup.trigger_choice(idx, self.metrics)
+        # remove this task from task list
+        self.tasks = [t for t in self.tasks if t.text != self.active_popup.title]
+        self.active_popup = None
 
 
 # this is the loading screen - must prompt user to select a file off of desktop and load
