@@ -8,8 +8,8 @@ import os
 from .config import *
 from .Button import Button
 from .agentsClass import Admin, Student, Player
-#from .MetricsClass import Metrics
-#from .Popups import PopupEvent
+from .MetricsClass import Metrics
+from .Popups import PopupEvent, minor_events, major_events
 from .menu import Menu, MenuManager
 import numpy as np
 
@@ -103,6 +103,9 @@ class MainGameMenu():
 # FIXME for building logic - we need to have a building class that can have a dictionary with building name as key and level #, need an upgrade building function
 class StartGame():
     def __init__(self, screen, font, gameStateManager):
+        #metrics initializing
+        self.metrics = Metrics()
+
         # general game logic
         self.menu_manager = MenuManager(main_data=[])
         self.screen = screen
@@ -169,9 +172,9 @@ class StartGame():
         self.player_y = 0
     
     # FIXME need some way to make sure that it notifies user that you can't use it if task is not empty
-    def next_sem(self):
+    """ def next_sem(self):
         if self.semester < 8 and len(self.tasks) == 0:
-            self.semester += 1
+            self.semester += 1 """
 
     # generic building menu
     def show_building_menu(self, building_name):
@@ -271,6 +274,68 @@ class StartGame():
         self.next_semester_button.draw(self.screen)
         self.help_button.draw(self.screen)
         self.menu_manager.draw(self.screen)
+
+    def generate_tasks(self):
+        # clear old tasks
+        self.tasks.clear()
+        tasks_to_add = []
+        if self.semester % 2 == 1:   # start of semester
+            tasks_to_add = random.sample(minor_events, 2)
+        else:                        # end of semester
+            tasks_to_add = random.sample(minor_events, 1) + random.sample(major_events, 1)
+
+        y_offset = 150
+        for event in tasks_to_add:
+            btn = Button(
+                dimensions=(20, y_offset, self.panel_width - 40, 50),
+                text=event.title,
+                callback=lambda e=event: self.open_popup(e),
+                base_color=BUTTON_COLOR,
+                hover_color=BUTTON_HOVER,
+                text_color=TEXT_COLOR
+            )
+            self.tasks.append(btn)
+            y_offset += 60
+
+def open_popup(self, event):
+    self.active_popup = event
+
+def draw_popup(self):
+    popup = self.active_popup
+    if not popup:
+        return
+    rect = py.Rect(WINDOW_WIDTH//2 - 300, WINDOW_HEIGHT//2 - 200, 600, 400)
+    py.draw.rect(self.screen, PANEL_COLOR, rect)
+    py.draw.rect(self.screen, BORDER_COLOR, rect, 3)
+
+    # draw title & description
+    title_surf = self.font.render(popup.title, True, TEXT_COLOR)
+    desc_surf = self.font.render(popup.description, True, TEXT_COLOR)
+    self.screen.blit(title_surf, (rect.x + 20, rect.y + 20))
+    self.screen.blit(desc_surf, (rect.x + 20, rect.y + 60))
+
+    # draw choices as buttons
+    self.choice_buttons = []
+    y = rect.y + 120
+    for i, choice in enumerate(popup.choices):
+        btn = Button(
+            dimensions=(rect.x + 100, y, 400, 40),
+            text=choice.text,
+            callback=lambda idx=i: self.choose_option(idx),
+            base_color=BUTTON_COLOR,
+            hover_color=BUTTON_HOVER,
+            text_color=TEXT_COLOR
+        )
+        btn.draw(self.screen)
+        self.choice_buttons.append(btn)
+        y += 60
+
+def choose_option(self, idx):
+    self.active_popup.trigger_choice(idx, self.metrics)
+    # remove this task from task list
+    self.tasks = [t for t in self.tasks if t.text != self.active_popup.title]
+    self.active_popup = None
+
 
 # this is the loading screen - must prompt user to select a file off of desktop and load
 # FIXME func of load_game not implemented, need sql database
