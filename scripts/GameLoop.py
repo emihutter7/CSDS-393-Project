@@ -244,7 +244,20 @@ class StartGame():
         py.draw.rect(self.screen, PANEL_COLOR, (metrics_panel_x, 70, self.panel_width, WINDOW_HEIGHT - 70))
         py.draw.rect(self.screen, BORDER_COLOR, (metrics_panel_x, 70, self.panel_width, WINDOW_HEIGHT - 70), width=3)
         self.screen.blit(self.font.render("Metrics", True, TEXT_COLOR), (metrics_panel_x + 15, 80))
-        
+
+        #draws metrics
+        metrics_x = WINDOW_WIDTH - self.panel_width + 15
+        y = 110
+        for label, value in [
+            ("Budget", f"${self.metrics.budget:,}"),
+            ("Prestige", self.metrics.prestige),
+            ("Student Happiness", self.metrics.sHappiness),
+            ("Admin Happiness", self.metrics.aHappiness),
+            ("Security", self.metrics.security),
+            ("Academics", self.metrics.academics)
+        ]:
+            self.screen.blit(self.font.render(f"{label}: {value}", True, TEXT_COLOR), (metrics_x, y))
+            y += 30
 
         # event handling logic
         for event in py.event.get():
@@ -282,6 +295,10 @@ class StartGame():
         self.next_semester_button.draw(self.screen)
         self.help_button.draw(self.screen)
         self.menu_manager.draw(self.screen)
+
+        #draw task buttons
+        for btn in self.tasks:
+            btn.draw(self.screen)
 
     def generate_tasks(self):
         # clear old tasks
