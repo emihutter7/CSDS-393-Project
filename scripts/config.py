@@ -27,6 +27,7 @@ FPS = 60
 DATABASE_CONFIGURATION = {
     "dbname": "GameState",
     "user": "postgres",
+    "password": "swe2025",
     "host": "localhost",         
     "port": "5432"   
 }
