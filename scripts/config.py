@@ -24,4 +24,12 @@ BUTTON_HOVER = (200, 150, 100)    # lighter brown on hover
 TEXT_COLOR = (40, 30, 20)         # dark text
 FPS = 60
 
+DATABASE_CONFIGURATION = {
+    "dbname": "GameState",
+    "user": "postgres",
+    "host": "localhost",         
+    "port": "5432"   
+}
+
+
 # Other potential constants (e.g., FPS, game title, etc.) would go here.
