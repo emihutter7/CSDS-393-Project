@@ -13,13 +13,22 @@ class Agent:
         self.path_end = path_end
         self.direction = 1  # 1 = forward, -1 = backward
 
+    
+    def move_along_path1(self, temp_start, temp_end, reached_end=False):
+        # Move horizontally for now
+        self.x += self.speed * self.direction
+        if (self.direction == 1 and self.x >= self.path_end[0]) or \
+           (self.direction == -1 and self.x <= self.path_start[0]):
+            self.direction *= -1  # reverse direction
+
+
     def move_along_path(self):
         # Move horizontally for now
         self.x += self.speed * self.direction
         if (self.direction == 1 and self.x >= self.path_end[0]) or \
            (self.direction == -1 and self.x <= self.path_start[0]):
             self.direction *= -1  # reverse direction
-        print(f"START={self.path_start[1]}, END={self.path_end[1]}, CURRENT={self.y}")
+        # print(f"START={self.path_start[1]}, END={self.path_end[1]}, CURRENT={self.y}")
 
 
     def draw(self, window):
