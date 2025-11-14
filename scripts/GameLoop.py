@@ -168,24 +168,37 @@ class StartGame():
         ]
         self.menu_manager.main_setup(self.building_data)
 
-        # player and agents data
-        # Set up 1 student and 1 admin walking the Glennan <-> Tomlinson road
+        # Speeds
+        student_speeds = [2, 1, 2.2]
+        admin_speeds   = [.8, 1.5, 1.2]
 
-        self.student = Student(
-            x=336,               # left end of the road
-            y=735,
-            color=(0, 255, 0),
-            speed=0.8,
-            path_end=(756, 735)  # right end of the road
-        )
+        # Road A (Lower Quad)
+        roadA_left  = (336, 735)
+        roadA_right = (756, 735)
 
-        self.admin = Admin(
-            x=336,               # right end of the road
-            y=735,
-            color=(0, 0, 0),
-            speed=0.6,
-            path_end=(756, 735)  # left end of the road
-        )
+        # Road B (Upper Quad)
+        roadB_left  = (405, 660)
+        roadB_right = (600, 660)
+
+        # STUDENTS
+        self.students = [
+            # Road A student
+            Student(roadA_left[0], roadA_left[1], (0,255,0), student_speeds[0], roadA_right),
+
+            # Road B students
+            Student(roadB_left[0], roadB_left[1], (0,255,0), student_speeds[1], roadB_right),
+            Student(roadB_left[0], roadB_left[1], (0,255,0), student_speeds[2], roadB_right),
+        ]
+
+        # ADMINS
+        self.admins = [
+            # Road A admins
+            Admin(roadA_left[0], roadA_left[1], (0,0,0), admin_speeds[0], roadA_right),
+            Admin(roadA_left[0], roadA_left[1], (0,0,0), admin_speeds[1], roadA_right),
+
+            # Road B admin
+            Admin(roadB_left[0], roadB_left[1], (0,0,0), admin_speeds[2], roadB_right),
+        ]
         self.player = Player(200, 300)
         self.player_velocity = [0, 0]
         self.player_input = {"left": False, "right": False, "up": False, "down": False, "select": False}
@@ -425,13 +438,13 @@ class StartGame():
         self.player_x += self.player_velocity[0] * 5
         self.player_y += self.player_velocity[1] * 5
 
-        # Move & draw the single student
-        self.student.move_along_path()
-        self.student.draw(self.screen)
+        for s in self.students:
+            s.move_along_path()
+            s.draw(self.screen)
 
-        # Move & draw the single admin
-        self.admin.move_along_path()
-        self.admin.draw(self.screen)
+        for a in self.admins:
+            a.move_along_path()
+            a.draw(self.screen)
 
         # draw all other buttons
         self.next_semester_button.draw(self.screen)

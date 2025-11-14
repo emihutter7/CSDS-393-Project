@@ -48,15 +48,6 @@ class Agent:
                 self.y = sy
                 self.direction = 1
 
-    # def move_along_path(self):
-    #     # Move horizontally for now
-    #     self.x += self.speed * self.direction
-    #     if (self.direction == 1 and self.x >= self.path_end[0]) or \
-    #        (self.direction == -1 and self.x <= self.path_start[0]):
-    #         self.direction *= -1  # reverse direction
-    #     # print(f"START={self.path_start[1]}, END={self.path_end[1]}, CURRENT={self.y}")
-
-
     def draw(self, window):
         pass  # will be defined in subclasses
 
