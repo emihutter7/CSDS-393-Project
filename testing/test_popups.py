@@ -507,7 +507,7 @@ def test_donor_gala_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget + 2_000_000  # -6M +8M net
+    assert m.budget == start_budget - 6_000_000  # -6M +8M net
     assert m.prestige == start_prestige + 15
 
 # test expansion plan choice one

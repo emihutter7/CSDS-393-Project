@@ -358,7 +358,7 @@ major_events = [
         "A high-profile event for alumni and investors is being organized.",
         "major",
         [
-            PopupChoice("Host lavish event", {"budget": -6000000, "prestige": +15, "budget": +8000000}),
+            PopupChoice("Host lavish event", {"budget": -6000000, "prestige": +15}),
             PopupChoice("Host modest reception", {"budget": -2000000, "prestige": +10}),
             PopupChoice("Cancel due to costs", {"prestige": -10})
         ]
