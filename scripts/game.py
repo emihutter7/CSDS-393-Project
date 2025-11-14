@@ -92,7 +92,74 @@ class Player:
     def draw(self, window):
         pygame.draw.rect(window, self.color, (self.x, self.y, self.size, self.size))
 
-running = True
+
+def main():
+    running = True
+    while running:
+
+        WINDOW.fill(GRAY)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                check_input(event.key, True)
+            elif event.type == pygame.KEYUP:
+                check_input(event.key, False)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                check_selection(pygame.mouse.get_pos())
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if selected_button:
+                    selected_button = None
+                    
+        # Create player
+    player = Player(200, 300)
+
+    # Create agents with straight-line paths
+    students = [Student(random.randint(100, 400), random.randint(100, 400),
+                        (0, 255, 0), speed=1.5, path_end=(500, random.randint(100, 400)))
+                for _ in range(5)]
+
+    admins = [Admin(random.randint(100, 400), random.randint(100, 400),
+                    (0, 0, 0), speed=1, path_end=(550, random.randint(100, 400)))
+            for _ in range(2)]
+
+    player_velocity[0] = player_input['right'] - player_input['left'] # velocity in X direction. If right is true then 1 - 0 = 1, if left is tru thenn 0 - 1 = -1
+    player_velocity[1] = player_input['up'] - player_input['down'] # velocity in Y direction. If up is true then 1 - 0 = 1, if downn is tru thenn 0 - 1 = -1
+
+    pygame.draw.rect(WINDOW, RED, (0, 0, 100, 100)) # (WINDOW, COLOR, (X, Y, WIDTH, HEIGHT))
+    pygame.draw.circle(WINDOW, BLUE, (0, 0, 100, 100)) 
+
+    building_rect = pygame.Rect(100, 100, 200, 150)  # x, y, width, height
+
+    player_x += player_velocity[0] * 5
+    player_y += player_velocity[1] * 5
+
+    # Move & draw AI agents
+    for s in students:
+        s.move_along_path()
+        s.draw(WINDOW)
+
+    for a in admins:
+        a.move_along_path()
+        a.draw(WINDOW)
+
+    # Draw player
+    player.draw(WINDOW)
+
+    CLOCK.tick(60)
+
+    pygame.display.update()
+
+
+
+    ## whenever keystroke is recognized/button is pressed, update using handlers here
+
+pygame.quit()
+sys.exit() # will not close in ipynb because it is an interactive environment, just displays the error """
+
+
+""" running = True
 while running:
 
     WINDOW.fill(GRAY)
@@ -155,4 +222,4 @@ while running:
     ## whenever keystroke is recognized/button is pressed, update using handlers here
 
 pygame.quit()
-sys.exit() # will not close in ipynb because it is an interactive environment, just displays the error
+sys.exit() # will not close in ipynb because it is an interactive environment, just displays the error """
