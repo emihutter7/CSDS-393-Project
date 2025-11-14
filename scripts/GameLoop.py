@@ -16,6 +16,7 @@ from .menu import Menu, MenuManager
 import numpy as np
 from .GameState import GameState
 
+
 # main loop set up, with the screen, clock, and state manager created
 class Game:
     def __init__(self):
@@ -141,35 +142,71 @@ class StartGame():
             ("NRV Dorms", lambda : self.show_building_menu("NRV Dorms"), (370, 120, 80, 80), "../images/testing2.png"),
             ("Leutner", lambda : self.show_building_menu("Leutner"), (400, 70, 50, 50)),
             ("Wyant", lambda : self.show_building_menu("Wyant"), (500, 20, 50, 50)),
-            ("PBL", lambda : self.show_building_menu("PBL"), (330, 310, 70, 70)),
-            ("Tink UC", lambda : self.show_building_menu("Tink UC"), (400, 380, 50, 100)),
-            ("Thwing", lambda : self.show_building_menu("Thwing"), (460, 430, 60, 40)),
-            ("KSL", lambda : self.show_building_menu("KSL"), (345, 490, 70, 70)),
+
+            ("PBL", lambda : self.show_building_menu("PBL"), (230, 210, 70, 70)),
+            ("Tink UC", lambda : self.show_building_menu("Tink UC"), (300, 280, 50, 100)),
+            ("Thwing", lambda : self.show_building_menu("Thwing"), (360, 330, 60, 40)),
+            ("KSL", lambda : self.show_building_menu("KSL"), (245, 390, 70, 70)),
             ("SRV Dorms", lambda : self.show_building_menu("SRV Dorms"), (900, 600, 70, 70)),
-            ("Allen Ford", lambda : self.show_building_menu("Allen Ford"), (480, 570, 50, 50)),
+
+            ("Allen Ford", lambda : self.show_building_menu("Allen Ford"), (450, 460, 50, 50)),
             ("Fribley", lambda : self.show_building_menu("Fribley"), (890, 675, 50, 50)),
-            ("Veale", lambda : self.show_building_menu("Veale"), (800, 750, 70, 70)),
+     
+            ("Veale", lambda : self.show_building_menu("Veale"), (810, 750, 70, 70)),
             ("Glennan", lambda : self.show_building_menu("Glennan"), (730, 770, 50, 50)),
-            ("White", lambda : self.show_building_menu("White"), (680, 770, 50, 50)),
-            ("Olin", lambda : self.show_building_menu("Olin"), (630, 770, 50, 50)),
-            ("Nord", lambda : self.show_building_menu("Nord"), (570, 770, 50, 50)),
-            ("Sears", lambda : self.show_building_menu("Sears"), (520, 770, 50, 50)),
-            ("Wick.", lambda : self.show_building_menu("Wick."), (460, 770, 50, 50)),
-            ("ISEB", lambda : self.show_building_menu("ISEB"), (410, 770, 50, 50)),
-            ("Tomlinson", lambda : self.show_building_menu("Tomlinson"), (360, 770, 50, 50)),
-            ("Crawford", lambda : self.show_building_menu("Crawford"), (340, 700, 50, 50)),
-            ("Adelbert", lambda : self.show_building_menu("Adelbert"), (390, 630, 50, 50)),
-            ("Rockefeller", lambda : self.show_building_menu("Rockefeller"), (480, 660, 50, 50)),
-            ("Strosacker", lambda : self.show_building_menu("Strosacker"), (530, 660, 50, 50)),
-            ("AW Smith", lambda : self.show_building_menu("AW Smith"), (580, 660, 50, 50)),
-            ("Bingham", lambda : self.show_building_menu("Bingham"), (650, 700, 50, 50)),
-            ("Schmitt", lambda : self.show_building_menu("Schmitt"), (540, 600, 50, 50)),
+            ("White", lambda : self.show_building_menu("White"), (675, 770, 50, 50)),
+            ("Olin", lambda : self.show_building_menu("Olin"), (620, 770, 50, 50)),
+
+            ("Nord", lambda : self.show_building_menu("Nord"), (550, 770, 50, 50)),
+            ("Sears", lambda : self.show_building_menu("Sears"), (495, 770, 50, 50)),
+
+            ("Wick.", lambda : self.show_building_menu("Wick."), (425, 770, 50, 50)),
+            ("ISEB", lambda : self.show_building_menu("ISEB"), (370, 770, 50, 50)),
+            ("Tomlinson", lambda : self.show_building_menu("Tomlinson"), (315, 770, 50, 50)),
+
+            ("Crawford", lambda : self.show_building_menu("Crawford"), (290, 655, 50, 50)),
+            ("Adelbert", lambda : self.show_building_menu("Adelbert"), (340, 540, 50, 50)),
+
+            ("Rockefeller", lambda : self.show_building_menu("Rockefeller"), (445, 585, 50, 50)),
+            ("Strosacker", lambda : self.show_building_menu("Strosacker"), (500, 585, 50, 50)),
+            ("AW Smith", lambda : self.show_building_menu("AW Smith"), (555, 585, 50, 50)),
+
+            ("Bingham", lambda : self.show_building_menu("Bingham"), (630, 660, 50, 50)),
+            ("Schmitt", lambda : self.show_building_menu("Schmitt"), (510, 505, 50, 50)),
         ]
         self.menu_manager.main_setup(self.building_data)
 
-        # player and agents data
-        self.admins = [Admin(600, random.randint(10, 800), (0, 0, 0), speed=0.05, path_end=(600, 800)) for _ in range(2)]
-        self.students = [Student(600, random.randint(10, 800), (0, 255, 0), speed=0.05, path_end=(600, 830)) for _ in range(4)]
+        # Speeds
+        student_speeds = [2, 1, 2.2]
+        admin_speeds   = [.8, 1.5, 1.2]
+
+        # Road A (Lower Quad)
+        roadA_left  = (336, 735)
+        roadA_right = (756, 735)
+
+        # Road B (Upper Quad)
+        roadB_left  = (405, 660)
+        roadB_right = (600, 660)
+
+        # STUDENTS
+        self.students = [
+            # Road A student
+            Student(roadA_left[0], roadA_left[1], (0,255,0), student_speeds[0], roadA_right),
+
+            # Road B students
+            Student(roadB_left[0], roadB_left[1], (0,255,0), student_speeds[1], roadB_right),
+            Student(roadB_left[0], roadB_left[1], (0,255,0), student_speeds[2], roadB_right),
+        ]
+
+        # ADMINS
+        self.admins = [
+            # Road A admins
+            Admin(roadA_left[0], roadA_left[1], (0,0,0), admin_speeds[0], roadA_right),
+            Admin(roadA_left[0], roadA_left[1], (0,0,0), admin_speeds[1], roadA_right),
+
+            # Road B admin
+            Admin(roadB_left[0], roadB_left[1], (0,0,0), admin_speeds[2], roadB_right),
+        ]
         self.player = Player(200, 300)
         self.player_velocity = [0, 0]
         self.player_input = {"left": False, "right": False, "up": False, "down": False, "select": False}
@@ -291,17 +328,124 @@ class StartGame():
                     btn.handle_event(event)
             
 
-        # agents logic
-        self.students = [Student(600, random.randint(10, 800), (0, 255, 0), speed=0.05, path_end=(600, 830)) for _ in range(4)]
-        self.admins = [Admin(600, random.randint(10, 800), (0, 0, 0), speed=0.01, path_end=(600, 800)) for _ in range(2)]
+ 
 
+        road_vertical_wyant_to_ksl     = ((525, 70),  (525, 525))
+        road_horizontal_ksl_to_glennan = ((525, 525), (780, 525))
+        road_vertical_glennan_to_veale = ((780, 525), (780, 810))
+        road_horizontal_veale_to_olin  = ((800, 810), (630, 810))
+        ROAD_COLOR = (100, 100, 100)
+        ROAD_WIDTH = 10
+
+        # 1. Wyant → KSL
+        py.draw.line(self.screen, ROAD_COLOR, (540, 70),  (540, 425), ROAD_WIDTH)
+
+        # 2. KSL → Glennan
+        py.draw.line(self.screen, ROAD_COLOR, (315, 425), (765, 425), ROAD_WIDTH)
+
+        # 3. KSL → Veale vertical drop
+        py.draw.line(self.screen, ROAD_COLOR, (760, 425), (760, 770), ROAD_WIDTH)
+
+        # 4. Veale → Glennan
+        py.draw.line(self.screen, ROAD_COLOR, (810, 760), (756, 760), ROAD_WIDTH)
+
+        # 5. Glennan → Tomlinson   LOWER QUAD
+        py.draw.line(self.screen, ROAD_COLOR, (756, 735), (336, 735), ROAD_WIDTH)
+
+        # 6. Nord → Bingham   vertical upwards in quad
+        py.draw.line(self.screen, ROAD_COLOR, (600, 735), (600, 656), ROAD_WIDTH)
+
+        # 7. Bingham → Crawford   UPPER QUAD
+        py.draw.line(self.screen, ROAD_COLOR, (600, 660), (405, 660), ROAD_WIDTH)
+
+        # 8. ISEB → Thwing   vertical upwards from quad
+        py.draw.line(self.screen, ROAD_COLOR, (405, 735), (405, 370), ROAD_WIDTH)
+
+        # Vertical roads down into the bottom quad row (Tomlinson → White)
+        py.draw.line(self.screen, ROAD_COLOR, (340, 735), (340, 770), ROAD_WIDTH)   # Tomlinson
+        py.draw.line(self.screen, ROAD_COLOR, (395, 735), (395, 770), ROAD_WIDTH)   # ISEB
+        py.draw.line(self.screen, ROAD_COLOR, (450, 735), (450, 770), ROAD_WIDTH)   # Wick
+        py.draw.line(self.screen, ROAD_COLOR, (520, 735), (520, 770), ROAD_WIDTH)   # Sears
+        py.draw.line(self.screen, ROAD_COLOR, (575, 735), (575, 770), ROAD_WIDTH)   # Nord
+        py.draw.line(self.screen, ROAD_COLOR, (655, 735), (655, 770), ROAD_WIDTH)   # Olin
+        py.draw.line(self.screen, ROAD_COLOR, (700, 735), (700, 770), ROAD_WIDTH)   # White
+
+        # Vertical roads DOWN into the upper quad (Strosacker, Rockefeller, A.W. Smith)
+        py.draw.line(self.screen, ROAD_COLOR, (470, 660), (470, 635), ROAD_WIDTH)   # Rockefeller
+        py.draw.line(self.screen, ROAD_COLOR, (525, 660), (525, 635), ROAD_WIDTH)   # Strosacker
+        py.draw.line(self.screen, ROAD_COLOR, (580, 660), (580, 635), ROAD_WIDTH)   # AW Smith
+
+        # 1. To SRV Dorms (y-mid = 635)
+        py.draw.line(self.screen, ROAD_COLOR, (760, 635), (900, 635), ROAD_WIDTH)
+
+        # 2. To Fribley (y-mid = 700)
+        py.draw.line(self.screen, ROAD_COLOR, (760, 700), (890, 700), ROAD_WIDTH)
+
+        # Horizontal roads LEFT from x=405
+        py.draw.line(self.screen, ROAD_COLOR, (405, 680), (315, 680), ROAD_WIDTH)   # Crawford
+        py.draw.line(self.screen, ROAD_COLOR, (405, 565), (365, 565), ROAD_WIDTH)   # Adelbert
+
+        # Horizontal roads RIGHT from x=405
+        py.draw.line(self.screen, ROAD_COLOR, (405, 530), (535, 530), ROAD_WIDTH)   # Schmitt
+        py.draw.line(self.screen, ROAD_COLOR, (405, 485), (475, 485), ROAD_WIDTH)   # Allen Ford
+
+        # 1. Vertical KSL → PBL
+        py.draw.line(self.screen, ROAD_COLOR, (280, 390), (280, 280), ROAD_WIDTH)
+
+        # 2. Horizontal from that same x to Tink UC
+        py.draw.line(self.screen, ROAD_COLOR, (280, 330), (300, 330), ROAD_WIDTH)
+
+        # Horizontal roads LEFT from x = 540
+        py.draw.line(self.screen, ROAD_COLOR, (540, 95), (400, 95), ROAD_WIDTH)    # Leutner
+        py.draw.line(self.screen, ROAD_COLOR, (540, 160), (450, 160), ROAD_WIDTH)  # NRV Dorms
+
+        # Rightward road toward Bingham
+        py.draw.line(self.screen, ROAD_COLOR, (600, 685), (630, 685), ROAD_WIDTH)
+
+        # ---------- FIELD 1 ----------
+        field1_rect = py.Rect(420, 670, 165, 55)   # expanded + shifted
+        py.draw.rect(self.screen, (34,139,34), field1_rect, border_radius=12)
+        py.draw.rect(self.screen, (0,0,0), field1_rect, width=3, border_radius=12)
+
+        # ---------- FIELD 2 ----------
+        field2_rect = py.Rect(625, 450, 110, 185)  # expanded + shifted
+        py.draw.rect(self.screen, (34,139,34), field2_rect, border_radius=12)
+        py.draw.rect(self.screen, (0,0,0), field2_rect, width=3, border_radius=12)
+
+        # ---------- MEGA FIELD (top-right) ----------
+
+        # Outer brick rectangle
+        outer_field_rect = py.Rect(580, 20, 230, 140)
+        py.draw.rect(self.screen, (178, 34, 34), outer_field_rect)  # brick color
+        py.draw.rect(self.screen, (0,0,0), outer_field_rect, width=4)  # black border
+
+        # Inner rounded green field
+        inner_field_rect = py.Rect(590, 30, 210, 120)
+        py.draw.rect(self.screen, (34,139,34), inner_field_rect, border_radius=18)
+        py.draw.rect(self.screen, (255,255,255), inner_field_rect, width=3, border_radius=18)  # white border
+
+
+        # ---- Vertical white lines inside the mega field ----
+        num_lines = 10
+        spacing = inner_field_rect.width / (num_lines + 1)
+
+        for i in range(1, num_lines + 1):
+            x = inner_field_rect.x + int(i * spacing)
+            py.draw.line(
+                self.screen,
+                (255, 255, 255),  # white
+                (x, inner_field_rect.y),
+                (x, inner_field_rect.y + inner_field_rect.height - 1),
+                2  # line thickness
+            )
+
+        # agents logic
         self.player_velocity[0] = self.player_input['right'] - self.player_input['left'] # velocity in X direction. If right is true then 1 - 0 = 1, if left is tru thenn 0 - 1 = -1
         self.player_velocity[1] = self.player_input['up'] - self.player_input['down'] # velocity in Y direction. If up is true then 1 - 0 = 1, if downn is tru thenn 0 - 1 = -1
 
         self.player_x += self.player_velocity[0] * 5
         self.player_y += self.player_velocity[1] * 5
 
-        # move & draw AI agents
         for s in self.students:
             s.move_along_path()
             s.draw(self.screen)

@@ -1,6 +1,6 @@
 # Screen Dimensions
-WINDOW_WIDTH = 1200
-WINDOW_HEIGHT = 830
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 700
 
 # Colors (RGB)
 BG_COLOR = (240, 240, 240)  # Dark Gray
@@ -12,19 +12,5 @@ GRAY = (100, 100, 100)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-TAN_BG = (245, 222, 179)          # background
-PANEL_COLOR = (210, 180, 140)     # lighter tan for panels
-BORDER_COLOR = (100, 80, 60)      # deep brown for outlines
-BUTTON_COLOR = (180, 130, 90)     # medium brown for buttons
-BUTTON_HOVER = (200, 150, 100)    # lighter brown on hover
-TEXT_COLOR = (40, 30, 20)         # dark text
 
-FPS = 60
-
-DATABASE_CONFIGURATION = {
-    "dbname": "GameState",
-    "user": "postgres",
-    "password": "swe2025",
-    "host": "localhost",         
-    "port": "5432"   
-}
+# Other potential constants (e.g., FPS, game title, etc.) would go here.
