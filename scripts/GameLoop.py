@@ -624,7 +624,11 @@ class InGameMenu():
                 "students": len(self.start.students)
             }
 
-            save_path = os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
+            #NEW ADD BY RAAGHUV
+            save_path = self.get_save_path()
+
+            #COMMENTED OUT BY RAAGHUV
+            #save_path = os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
             with open(save_path, "w") as f:
                 json.dump(data, f, indent=4) ## FIXME change to db.execute or something (for sql compatability)
 
@@ -632,7 +636,11 @@ class InGameMenu():
 
         except Exception as e:
             print("Error saving game:", e)
-    
+            
+    #NEWLY ADDED BY RAAGHUV FOR TESTING RECURSION PROBLEM        
+    def get_save_path(self):
+        return os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
+
     def run(self):
         # draw overlay
         self.screen.fill(BLACK)

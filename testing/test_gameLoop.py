@@ -178,13 +178,20 @@ def test_in_game_menu_save_game_writes_json(monkeypatch, tmp_path):
 
     # bypass invalid getattr usage inside save_game
     monkeypatch.setattr(gl, "getattr", lambda value: value, raising=False)
-    monkeypatch.setattr(gl.os.path, "expanduser", lambda _: str(tmp_path))
+    
+    #MONKEY PATCH CRASHING CHANGED BY RAAGHUV
+    """ monkeypatch.setattr(gl.os.path, "expanduser", lambda _: str(tmp_path))
     monkeypatch.setattr(
         gl.os.path,
         "join",
         lambda *parts: str(tmp_path / "save_game.json"),
+    ) """
+    #NEW ADDITION BY RAAGHUV
+    monkeypatch.setattr(
+        gl.InGameMenu,
+        "get_save_path",
+        lambda self: str(tmp_path / "save_game.json"),
     )
-
     menu.save_game()
     saved = json.loads((tmp_path / "save_game.json").read_text())
     assert saved["player"]["x"] == 1
