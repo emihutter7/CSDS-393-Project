@@ -3,6 +3,8 @@ import pygame as py
 import random
 import json
 import os
+
+# from scripts.db import db_init
 #import tkinter as tk
 #from tkinter import filedialog
 from .config import *
@@ -13,6 +15,9 @@ from .Popups import PopupEvent, minor_events, major_events
 from .menu import Menu, MenuManager
 import numpy as np
 from .GameState import GameState
+from .db import db_init
+
+
 # main loop set up, with the screen, clock, and state manager created
 class Game:
     def __init__(self):
@@ -25,7 +30,9 @@ class Game:
         self.current_state = "Main Menu"
         self.font = py.font.SysFont(None, 24)
         self.gameStateManager = GameStateManager(self.current_state)
-        self.start = StartGame(self.screen, self.font, self.gameStateManager)
+        self.gameState = GameState()
+
+        self.start = StartGame(self.screen, self.font, self.gameStateManager, self.gameState)
         self.load = LoadGame(self.screen, self.font, self.start, self.gameStateManager)
         self.main_opt = MainGameMenu(self.screen, self.font, self.gameStateManager)
         self.in_game_opt = InGameMenu(self.screen, self.font, self.start, self.gameStateManager)
@@ -104,7 +111,7 @@ class MainGameMenu():
 # FIXME for metrics populating, we can create a metrics class object and have all the metrics in here? idk
 # FIXME for building logic - we need to have a building class that can have a dictionary with building name as key and level #, need an upgrade building function
 class StartGame():
-    def __init__(self, screen, font, gameStateManager):
+    def __init__(self, screen, font, gameStateManager, game_state):
 
         # general game logic
         self.menu_manager = MenuManager(main_data=[])
@@ -112,7 +119,7 @@ class StartGame():
         self.gameStateManager = gameStateManager
         self.font = font
         self.panel_width = WINDOW_WIDTH // 6
-
+        self.game_state = game_state
         # metrics and popups
         self.budget = 100000
         self.tasks = [] # was thinking a list of buttons that will cause popup to open
@@ -553,6 +560,13 @@ class LoadGame():
     
     # FIXME add propoer functionality for SQL
     def load_game(self):
+        self.start.game_state.load()
+
+        # Update StartGame attributes
+        self.start.metrics.budget = self.start.game_state.score
+        self.start.menu_manager.set_building_levels(self.start.game_state.buildings)
+        self.start.tasks = self.start.game_state.popups
+        
         # read a user inputted file
         self.start.player = None #placeholder, data should come from the database
 
@@ -609,6 +623,15 @@ class InGameMenu():
     
     # FIXME - (needs to be sql, was just testing functionality with this)
     def save_game(self):
+
+        self.start.game_state.score = self.start.metrics.budget
+        self.start.game_state.time_of_year = "Fall" 
+        self.start.game_state.buildings = self.start.menu_manager.get_building_levels()
+        self.start.game_state.popups = self.start.tasks
+
+        # Save to database
+        self.start.game_state.save()
+
         try:
             ## FIXME need to make sure everything (metrics, etc) are ALL being saved
             data = {
@@ -623,7 +646,11 @@ class InGameMenu():
                 "students": len(self.start.students)
             }
 
-            save_path = os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
+            #NEW ADD BY RAAGHUV
+            save_path = self.get_save_path()
+
+            #COMMENTED OUT BY RAAGHUV
+            #save_path = os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
             with open(save_path, "w") as f:
                 json.dump(data, f, indent=4) ## FIXME change to db.execute or something (for sql compatability)
 
@@ -631,7 +658,11 @@ class InGameMenu():
 
         except Exception as e:
             print("Error saving game:", e)
-    
+            
+    #NEWLY ADDED BY RAAGHUV FOR TESTING RECURSION PROBLEM        
+    def get_save_path(self):
+        return os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
+
     def run(self):
         # draw overlay
         self.screen.fill(BLACK)
