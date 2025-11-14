@@ -12,6 +12,7 @@ from .MetricsClass import Metrics
 from .Popups import PopupEvent, minor_events, major_events
 from .menu import Menu, MenuManager
 import numpy as np
+from GameState import GameState
 
 # main loop set up, with the screen, clock, and state manager created
 class Game:
@@ -19,6 +20,8 @@ class Game:
         py.init()
         self.screen = py.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)) #py.RESIZABLE - if we want to make it full screen, we have to resize EVERYTHING
         self.clock = py.time.Clock()
+
+        db_init()
 
         self.current_state = "Main Menu"
         self.font = py.font.SysFont(None, 24)
