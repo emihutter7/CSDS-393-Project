@@ -13,8 +13,6 @@ from .Popups import PopupEvent, minor_events, major_events
 from .menu import Menu, MenuManager
 import numpy as np
 from .GameState import GameState
-from .db import db_init
-
 # main loop set up, with the screen, clock, and state manager created
 class Game:
     def __init__(self):
