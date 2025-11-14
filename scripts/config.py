@@ -2,6 +2,9 @@
 WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 830
 
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 830
+
 # Colors (RGB)
 BG_COLOR = (240, 240, 240)  # Dark Gray
 PRIMARY_COLOR = (70, 130, 180)  # Steel Blue
@@ -28,3 +31,6 @@ DATABASE_CONFIGURATION = {
     "host": "localhost",         
     "port": "5432"   
 }
+
+
+# Other potential constants (e.g., FPS, game title, etc.) would go here.

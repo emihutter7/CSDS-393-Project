@@ -12,15 +12,41 @@ class Agent:
         self.path_start = (x, y)
         self.path_end = path_end
         self.direction = 1  # 1 = forward, -1 = backward
+        if x < path_end[0] or y < path_end[1]:
+            self.direction = 1
+        else:
+            self.direction = -1
 
+    
     def move_along_path(self):
-        # Move horizontally for now
-        self.x += self.speed * self.direction
-        if (self.direction == 1 and self.x >= self.path_end[0]) or \
-           (self.direction == -1 and self.x <= self.path_start[0]):
-            self.direction *= -1  # reverse direction
-        print(f"START={self.path_start[1]}, END={self.path_end[1]}, CURRENT={self.y}")
+        """Move straight between start and end; reverse when hitting endpoints."""
 
+        sx, sy = self.path_start
+        ex, ey = self.path_end
+
+        # Horizontal movement
+        if sy == ey:
+            self.x += self.speed * self.direction
+
+            # Check boundaries
+            if self.direction == 1 and self.x >= ex:
+                self.x = ex
+                self.direction = -1
+            elif self.direction == -1 and self.x <= sx:
+                self.x = sx
+                self.direction = 1
+
+        # Vertical movement
+        elif sx == ex:
+            self.y += self.speed * self.direction
+
+            # Check boundaries
+            if self.direction == 1 and self.y >= ey:
+                self.y = ey
+                self.direction = -1
+            elif self.direction == -1 and self.y <= sy:
+                self.y = sy
+                self.direction = 1
 
     def draw(self, window):
         pass  # will be defined in subclasses
