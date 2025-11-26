@@ -17,6 +17,12 @@ import numpy as np
 from .GameState import GameState
 from .db import db_init
 
+# whenever you need to import an image, use this method (see line 149)
+def resource_path(relative_path):
+    """Gets the correct path for resources in dev or packaged mode."""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return relative_path
 
 # main loop set up, with the screen, clock, and state manager created
 class Game:
@@ -130,8 +136,8 @@ class StartGame():
                                   base_color=BUTTON_COLOR,
                                   hover_color=BUTTON_HOVER,
                                   text_color=TEXT_COLOR)
-        self.next_semester_button = Button(dimensions=(10, WINDOW_HEIGHT - 150, 180, 60),
-                                    text="Next Semester",
+        self.next_turn_button = Button(dimensions=(10, WINDOW_HEIGHT - 150, 180, 60),
+                                    text="Next Turn",
                                     callback=self.next_sem,
                                     base_color=BUTTON_COLOR,
                                     hover_color=BUTTON_HOVER,
@@ -140,8 +146,8 @@ class StartGame():
         # if we put all images in the images folder, the relative directory will be easier to follow
         # dimensions should be x,y,width,height
         self.building_data = [
-            ("NRV Dorms", lambda : self.show_building_menu("NRV Dorms"), (370, 120, 80, 80), "../images/testing2.png"),
-            ("Leutner", lambda : self.show_building_menu("Leutner"), (400, 70, 50, 50)),
+            ("NRV Dorms", lambda : self.show_building_menu("NRV Dorms"), (370, 120, 80, 80), resource_path("images/testing2.png")),
+            ("Leut.", lambda : self.show_building_menu("Leutner"), (400, 70, 50, 50)),
             ("Wyant", lambda : self.show_building_menu("Wyant"), (500, 20, 50, 50)),
 
             ("PBL", lambda : self.show_building_menu("PBL"), (230, 210, 70, 70)),
@@ -151,10 +157,10 @@ class StartGame():
             ("SRV Dorms", lambda : self.show_building_menu("SRV Dorms"), (900, 600, 70, 70)),
 
             ("Allen Ford", lambda : self.show_building_menu("Allen Ford"), (450, 460, 50, 50)),
-            ("Fribley", lambda : self.show_building_menu("Fribley"), (890, 675, 50, 50)),
+            ("Frib.", lambda : self.show_building_menu("Fribley"), (890, 675, 50, 50)),
      
             ("Veale", lambda : self.show_building_menu("Veale"), (810, 750, 70, 70)),
-            ("Glennan", lambda : self.show_building_menu("Glennan"), (730, 770, 50, 50)),
+            ("Glen.", lambda : self.show_building_menu("Glennan"), (730, 770, 50, 50)),
             ("White", lambda : self.show_building_menu("White"), (675, 770, 50, 50)),
             ("Olin", lambda : self.show_building_menu("Olin"), (620, 770, 50, 50)),
 
@@ -163,17 +169,17 @@ class StartGame():
 
             ("Wick.", lambda : self.show_building_menu("Wick."), (425, 770, 50, 50)),
             ("ISEB", lambda : self.show_building_menu("ISEB"), (370, 770, 50, 50)),
-            ("Tomlinson", lambda : self.show_building_menu("Tomlinson"), (315, 770, 50, 50)),
+            ("Toml.", lambda : self.show_building_menu("Tomlinson"), (315, 770, 50, 50)),
 
-            ("Crawford", lambda : self.show_building_menu("Crawford"), (290, 655, 50, 50)),
-            ("Adelbert", lambda : self.show_building_menu("Adelbert"), (340, 540, 50, 50)),
+            ("Craw.", lambda : self.show_building_menu("Crawford"), (290, 655, 50, 50)),
+            ("Adel.", lambda : self.show_building_menu("Adelbert"), (340, 540, 50, 50)),
 
-            ("Rockefeller", lambda : self.show_building_menu("Rockefeller"), (445, 585, 50, 50)),
-            ("Strosacker", lambda : self.show_building_menu("Strosacker"), (500, 585, 50, 50)),
+            ("Rock.", lambda : self.show_building_menu("Rockefeller"), (445, 585, 50, 50)),
+            ("Stros.", lambda : self.show_building_menu("Strosacker"), (500, 585, 50, 50)),
             ("AW Smith", lambda : self.show_building_menu("AW Smith"), (555, 585, 50, 50)),
 
-            ("Bingham", lambda : self.show_building_menu("Bingham"), (630, 660, 50, 50)),
-            ("Schmitt", lambda : self.show_building_menu("Schmitt"), (510, 505, 50, 50)),
+            ("Bing.", lambda : self.show_building_menu("Bingham"), (630, 660, 50, 50)),
+            ("Schm.", lambda : self.show_building_menu("Schmitt"), (510, 505, 50, 50)),
         ]
         self.menu_manager.main_setup(self.building_data)
 
@@ -320,7 +326,7 @@ class StartGame():
                 self.check_input(event.key, False)
             self.menu_manager.handle_event(event)
             self.help_button.handle_event(event)
-            self.next_semester_button.handle_event(event)
+            self.next_turn_button.handle_event(event)
             for btn in self.tasks:
                 btn.handle_event(event)
             # handle popup choice button clicks when popup open
@@ -456,7 +462,7 @@ class StartGame():
             a.draw(self.screen)
 
         # draw all other buttons
-        self.next_semester_button.draw(self.screen)
+        self.next_turn_button.draw(self.screen)
         self.help_button.draw(self.screen)
         self.menu_manager.draw(self.screen)
 

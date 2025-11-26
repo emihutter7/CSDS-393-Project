@@ -60,11 +60,32 @@ class Button:
             pygame.draw.rect(surface, self.current_color, self.rect, border_radius=4)
             pygame.draw.rect(surface, self.border_color, self.rect, width=1, border_radius=4)
     
-        # -- text overlay --
+        # text overlay
         if self.text:
-            text_surface = self.font.render(self.text, True, self.text_color)
-            text_shape = text_surface.get_rect(center=self.rect.center)
-            surface.blit(text_surface, text_shape)
+    
+            padding = 0.5
+            max_w = self.rect.width - padding * 2
+            #max_h = self.rect.height - padding * 2
+
+            #initial_size = self.font.get_height()
+
+            wrapped_lines = self.wrap_text(
+                self.text,
+                self.font,
+                max_w
+            )
+
+            # center vertically
+            line_height = self.font.get_linesize()
+            total_height = len(wrapped_lines) * line_height
+            y = self.rect.y + (self.rect.height - total_height) // 2
+
+            # draw each wrapped line centered
+            for line in wrapped_lines:
+                surf = self.font.render(line, True, self.text_color)
+                rect = surf.get_rect(center=(self.rect.centerx, y + line_height // 2))
+                surface.blit(surf, rect)
+                y += line_height
 
     # handle all events for the button (so far just hover or click)
     def handle_event(self, event):
@@ -76,3 +97,23 @@ class Button:
             self.is_hovered = self.rect.collidepoint(event.pos)
 
         return None
+    
+    # same functionality as wrap text in menu
+    def wrap_text(self, text, font, max_width):
+        words = text.split(" ")
+        lines = []
+        current_line = ""
+
+        for word in words:
+            test_line = current_line + (" " if current_line else "") + word
+            if font.size(test_line)[0] <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+
+        if current_line:
+            lines.append(current_line)
+
+        return lines
