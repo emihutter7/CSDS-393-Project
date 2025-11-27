@@ -44,7 +44,25 @@ def db_init():
         already_completed BOOLEAN DEFAULT FALSE
     )
     """)
-     
+    
+    # Users table
+    curs.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        player_id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL
+    )
+    """)
+
+    # Scores table
+    curs.execute("""
+    CREATE TABLE IF NOT EXISTS scores (
+        id SERIAL PRIMARY KEY,
+        player_id INTEGER REFERENCES users(player_id),
+        score INTEGER NOT NULL
+    )
+    """)
+
     connection.commit()
     curs.close()
     connection.close()
@@ -123,5 +141,54 @@ def load_popups():
         for name, is_active, completed in rows
     ]
 
+# --- User auth functions ---
+def create_user(username, password):
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING player_id;",
+        (username, hashed.decode())
+    )
+    player_id = cur.fetchone()[0]
+    conn.commit()
+    cur.close()
+    conn.close()
+    return player_id
+
+def authenticate_user(username, password):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT password_hash FROM users WHERE username=%s;", (username,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row and bcrypt.checkpw(password.encode(), row[0].encode()):
+        return True
+    return False
+
+# --- High score functions ---
+def save_score(player_id, score):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO scores (player_id, score) VALUES (%s, %s);", (player_id, score))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def get_high_scores(top_n=10):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT u.username, s.score
+        FROM scores s
+        JOIN users u ON s.player_id = u.player_id
+        ORDER BY s.score DESC
+        LIMIT %s;
+    """, (top_n,))
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    return results
 
 

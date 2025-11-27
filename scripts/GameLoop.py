@@ -31,7 +31,7 @@ class Game:
         self.screen = py.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)) #py.RESIZABLE - if we want to make it full screen, we have to resize EVERYTHING
         self.clock = py.time.Clock()
 
-        # db_init()
+        db_init()
 
         self.current_state = "Main Menu"
         self.font = py.font.SysFont(None, 24)

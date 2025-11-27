@@ -26,9 +26,9 @@ FPS = 60
 # Other potential constants (e.g., FPS, game title, etc.) would go here.
 
 DATABASE_CONFIGURATION = {
-    'dbname': 'postgres',
+    'dbname': 'GameState',
     'user': 'postgres',
-    'password': 'your_password_here',
+    'password': 'swe2025',
     'host': 'localhost',
     'port': 5432
 }
