@@ -192,4 +192,16 @@ def get_high_scores(top_n=10):
     conn.close()
     return results
 
+def save_game(metrics, buildings, popups):
+    save_metrics(metrics["score"], metrics["time_of_year"])
+    save_buildings(buildings)
+    save_popups(popups)
+
+# Load all game state for current session
+def load_game():
+    metrics_row = load_metrics()
+    metrics = {"score": metrics_row[0], "time_of_year": metrics_row[1]}
+    buildings = load_buildings()
+    popups = load_popups()
+    return metrics, buildings, popups
 
