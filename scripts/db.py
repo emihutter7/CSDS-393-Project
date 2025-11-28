@@ -2,7 +2,7 @@ import psycopg2
 from .config import DATABASE_CONFIGURATION
 import bcrypt 
 
-#Access database
+# Access database
 def get_connection():
     connection = psycopg2.connect(
         dbname = DATABASE_CONFIGURATION['dbname'],
@@ -13,7 +13,7 @@ def get_connection():
     )
     return connection
 
-#Creates all game tables if they don't yet exist
+# Creates all game tables if they don't yet exist
 def db_init():
     connection = get_connection()
     curs = connection.cursor()
@@ -71,9 +71,7 @@ def db_init():
     )
     """)
 
-    # -------------------------------
-    # PER-USER GAME SAVE TABLES
-    # -------------------------------
+    # Per-User game save tables
 
     curs.execute("""
     CREATE TABLE IF NOT EXISTS user_metrics (
@@ -106,10 +104,7 @@ def db_init():
     curs.close()
     connection.close()
 
-    # Merics methods
-# -------------------------------------------------------------
-# GLOBAL SAVE FUNCTIONS 
-# -------------------------------------------------------------
+# Global save methods
 
 def save_metrics(score, time_of_year):
     conn = get_connection()
@@ -130,7 +125,7 @@ def load_metrics():
     conn.close()
     return row if row else (0, "Spring")
 
-    # Buildings methods
+# Buildings methods
 
 def save_buildings(buildings):
     conn = get_connection()
@@ -154,7 +149,7 @@ def load_buildings():
     conn.close()
     return {name: level for name, level in rows}
 
-    # Popups methods
+# Popups methods
 
 def save_popups(popups):
     conn = get_connection()
@@ -183,7 +178,8 @@ def load_popups():
         for name, is_active, completed in rows
     ]
 
-# --- User auth functions ---
+# User authentication methods
+
 def create_user(username, password):
     hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     conn = get_connection()
@@ -209,7 +205,8 @@ def authenticate_user(username, password):
         return True
     return False
 
-# --- High score functions ---
+# High score methods
+
 def save_score(player_id, score):
     conn = get_connection()
     cur = conn.cursor()
@@ -243,14 +240,13 @@ def get_user_id(username):
     conn.close()
     return row[0] if row else None
 
-# -------------------------------------------------------------
-# PER-USER SAVE + LOAD
-# -------------------------------------------------------------
+# Per-user save and load methods
+
 def save_game_for_user(player_id, metrics, buildings, popups):
     conn = get_connection()
     cur = conn.cursor()
 
-    # metrics
+    # Metrics
     cur.execute("""
         INSERT INTO user_metrics (player_id, score, time_of_year)
         VALUES (%s, %s, %s)
@@ -259,7 +255,7 @@ def save_game_for_user(player_id, metrics, buildings, popups):
             time_of_year = EXCLUDED.time_of_year;
     """, (player_id, metrics["score"], metrics["time_of_year"]))
 
-    # buildings
+    # Buildings
     for name, level in buildings.items():
         cur.execute("""
             INSERT INTO user_buildings (player_id, name, level)
@@ -268,7 +264,7 @@ def save_game_for_user(player_id, metrics, buildings, popups):
             SET level = EXCLUDED.level;
         """, (player_id, name, level))
 
-    # popups
+    # Popups
     for popup in popups:
         cur.execute("""
             INSERT INTO user_popups (player_id, name, is_active, already_completed)
@@ -308,9 +304,7 @@ def load_game_for_user(player_id):
     conn.close()
     return metrics, buildings, popups
 
-# ------------------
-# LOADING SAVED GAME
-# ------------------
+# Methods for loading a saved game
 import json
 
 def save_full_state(player_id, state_dict):
@@ -346,4 +340,4 @@ def load_full_state(player_id):
         return None
 
     print("FULL STATE LOADED for", player_id)
-    return row[0]  # This is a dict because psycopg2 auto-parses JSONB
+    return row[0]  
