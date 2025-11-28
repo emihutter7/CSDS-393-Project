@@ -36,6 +36,7 @@ def test_popups_save_load():
     save_popups(popups)
     loaded = load_popups()
     assert len(loaded) == 2
+    
     # Check that all fields match
     for p in popups:
         match = next((l for l in loaded if l["name"] == p["name"]), None)
