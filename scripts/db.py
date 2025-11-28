@@ -18,6 +18,13 @@ def db_init():
     connection = get_connection()
     curs = connection.cursor()
 
+    curs.execute("""
+    CREATE TABLE IF NOT EXISTS user_state (
+        player_id INTEGER PRIMARY KEY REFERENCES users(player_id),
+        state_json JSONB
+    )
+    """)
+    
     # Metrics table
     curs.execute("""
     CREATE TABLE IF NOT EXISTS metrics (
@@ -64,11 +71,45 @@ def db_init():
     )
     """)
 
+    # -------------------------------
+    # PER-USER GAME SAVE TABLES
+    # -------------------------------
+
+    curs.execute("""
+    CREATE TABLE IF NOT EXISTS user_metrics (
+        player_id INTEGER PRIMARY KEY REFERENCES users(player_id),
+        score INTEGER NOT NULL,
+        time_of_year TEXT NOT NULL
+    )
+    """)
+
+    curs.execute("""
+    CREATE TABLE IF NOT EXISTS user_buildings (
+        player_id INTEGER REFERENCES users(player_id),
+        name TEXT NOT NULL,
+        level INTEGER NOT NULL,
+        PRIMARY KEY (player_id, name)
+    )
+    """)
+
+    curs.execute("""
+    CREATE TABLE IF NOT EXISTS user_popups (
+        player_id INTEGER REFERENCES users(player_id),
+        name TEXT NOT NULL,
+        is_active BOOLEAN NOT NULL,
+        already_completed BOOLEAN NOT NULL,
+        PRIMARY KEY (player_id, name)
+    )
+    """)
+
     connection.commit()
     curs.close()
     connection.close()
 
     # Merics methods
+# -------------------------------------------------------------
+# GLOBAL SAVE FUNCTIONS 
+# -------------------------------------------------------------
 
 def save_metrics(score, time_of_year):
     conn = get_connection()
@@ -192,16 +233,117 @@ def get_high_scores(top_n=10):
     conn.close()
     return results
 
-def save_game(metrics, buildings, popups):
-    save_metrics(metrics["score"], metrics["time_of_year"])
-    save_buildings(buildings)
-    save_popups(popups)
+def get_user_id(username):
+    """Return the player's ID for a given username, or None if not found."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT player_id FROM users WHERE username = %s;", (username,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return row[0] if row else None
 
-# Load all game state for current session
-def load_game():
-    metrics_row = load_metrics()
-    metrics = {"score": metrics_row[0], "time_of_year": metrics_row[1]}
-    buildings = load_buildings()
-    popups = load_popups()
+# -------------------------------------------------------------
+# PER-USER SAVE + LOAD
+# -------------------------------------------------------------
+def save_game_for_user(player_id, metrics, buildings, popups):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # metrics
+    cur.execute("""
+        INSERT INTO user_metrics (player_id, score, time_of_year)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (player_id) DO UPDATE
+        SET score = EXCLUDED.score,
+            time_of_year = EXCLUDED.time_of_year;
+    """, (player_id, metrics["score"], metrics["time_of_year"]))
+
+    # buildings
+    for name, level in buildings.items():
+        cur.execute("""
+            INSERT INTO user_buildings (player_id, name, level)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (player_id, name) DO UPDATE
+            SET level = EXCLUDED.level;
+        """, (player_id, name, level))
+
+    # popups
+    for popup in popups:
+        cur.execute("""
+            INSERT INTO user_popups (player_id, name, is_active, already_completed)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (player_id, name) DO UPDATE
+            SET is_active = EXCLUDED.is_active,
+                already_completed = EXCLUDED.already_completed;
+        """, (player_id, popup['name'], popup['is_active'], popup['already_completed']))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def load_game_for_user(player_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # metrics
+    cur.execute("SELECT score, time_of_year FROM user_metrics WHERE player_id=%s;", (player_id,))
+    row = cur.fetchone()
+    metrics = {"score": row[0], "time_of_year": row[1]} if row else {"score": 0, "time_of_year": "Spring"}
+
+    # buildings
+    cur.execute("SELECT name, level FROM user_buildings WHERE player_id=%s;", (player_id,))
+    buildings = {name: level for name, level in cur.fetchall()}
+
+    # popups
+    cur.execute("SELECT name, is_active, already_completed FROM user_popups WHERE player_id=%s;", (player_id,))
+    popup_rows = cur.fetchall()
+    popups = [
+        {"name": n, "is_active": act, "already_completed": done}
+        for n, act, done in popup_rows
+    ]
+
+    cur.close()
+    conn.close()
     return metrics, buildings, popups
 
+# ------------------
+# LOADING SAVED GAME
+# ------------------
+import json
+
+def save_full_state(player_id, state_dict):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO user_state (player_id, state_json)
+        VALUES (%s, %s)
+        ON CONFLICT (player_id)
+        DO UPDATE SET state_json = EXCLUDED.state_json
+    """, (player_id, json.dumps(state_dict)))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("FULL STATE SAVED for", player_id)
+
+
+def load_full_state(player_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT state_json FROM user_state WHERE player_id = %s
+    """, (player_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if row is None:
+        print("No saved state for user", player_id)
+        return None
+
+    print("FULL STATE LOADED for", player_id)
+    return row[0]  # This is a dict because psycopg2 auto-parses JSONB

@@ -174,12 +174,14 @@ class Menu:
 ## MenuManager Wrapper
 class MenuManager:
 
-    def __init__(self, main_data):
+    def __init__(self, main_data=None):
+        if main_data is None:
+            main_data = []
 
-        self.main_buttons = []
-        self.active_menu = None
-        
-        self.main_setup(main_data)
+        self.main_data = main_data          # Store the building definitions
+        self.building_levels = {}           # Clean storage for save/load
+        self.main_buttons = []              # Buttons created during setup
+        self.active_menu = None         
 
     def main_setup(self, data):
         """
@@ -265,3 +267,10 @@ class MenuManager:
             # If no menu is active, allow interaction with main buttons.
             for button in self.main_buttons:
                 button.handle_event(event)
+    
+    def get_building_levels(self):
+        return dict(self.building_levels)
+
+
+    def set_building_levels(self, levels_dict):
+        self.building_levels = dict(levels_dict)

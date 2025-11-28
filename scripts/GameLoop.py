@@ -33,10 +33,12 @@ class Game:
 
         db_init()
 
-        self.current_state = "Main Menu"
+        self.current_state = "Auth"
         self.font = py.font.SysFont(None, 24)
         self.gameStateManager = GameStateManager(self.current_state)
         self.gameState = GameState()
+        self.auth = LoginRegisterScreen(self.screen, self.font, self.gameStateManager)
+
 
         self.start = StartGame(self.screen, self.font, self.gameStateManager, self.gameState)
         self.load = LoadGame(self.screen, self.font, self.start, self.gameStateManager)
@@ -44,6 +46,7 @@ class Game:
         self.in_game_opt = InGameMenu(self.screen, self.font, self.start, self.gameStateManager)
 
         self.states = {
+            "Auth": self.auth,
             "Main Menu" : self.main_opt,
             "Start Game" : self.start,
             "Load Game" : self.load,
@@ -60,6 +63,190 @@ class Game:
             
             py.display.update()
             self.clock.tick(FPS)
+
+class LoginRegisterScreen:
+    def __init__(self, screen, font, gameStateManager):
+        self.screen = screen
+        self.font = font
+        self.gameStateManager = gameStateManager
+
+        self.username = ""
+        self.password = ""
+        self.active_field = None  # "user" or "pass"
+        self.message = ""
+
+        button_width = 250
+        button_height = 70
+        center_x = WINDOW_WIDTH // 2 - button_width // 2
+        center_y = WINDOW_HEIGHT // 2
+
+        self.login_button = Button(
+            dimensions=(center_x, center_y + 80, button_width, button_height),
+            text="Login",
+            callback=self.login_user,
+            fontsize=40
+        )
+
+        self.register_button = Button(
+            dimensions=(center_x, center_y + 170, button_width, button_height),
+            text="Register",
+            callback=self.register_user,
+            fontsize=40
+        )
+
+    def login_user(self):
+        from .db import authenticate_user
+        if authenticate_user(self.username, self.password):
+            self.message = "Login successful!"
+            self.gameStateManager.player_username = self.username
+            self.gameStateManager.set_current_state("Main Menu")
+        else:
+            self.message = "Invalid username or password"
+
+    def register_user(self):
+        from .db import create_user
+        try:
+            create_user(self.username, self.password)
+            self.message = "Account created! Please log in."
+        except:
+            self.message = "Username already exists"
+
+    def draw_textbox(self, x, y, width, height, text, active):
+        color = (255,255,255) if active else (200,200,200)
+        py.draw.rect(self.screen, color, (x, y, width, height))
+        label = self.font.render(text, True, (0,0,0))
+        self.screen.blit(label, (x + 5, y + 8))
+
+    def run(self):
+
+        self.screen.fill((20,20,20))
+        title = self.font.render("User Login", True, WHITE)
+        self.screen.blit(title, (WINDOW_WIDTH//2 - 60, 80))
+
+        self.draw_textbox(500, 200, 400, 40, self.username, self.active_field=="user")
+        self.draw_textbox(500, 260, 400, 40, "*"*len(self.password), self.active_field=="pass")
+
+        msg = self.font.render(self.message, True, (255,100,100))
+        self.screen.blit(msg, (300, 320))
+
+        self.login_button.draw(self.screen)
+        self.register_button.draw(self.screen)
+
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                py.quit(); sys.exit()
+
+            if event.type == py.MOUSEBUTTONDOWN:
+                if 300 <= event.pos[0] <= 700:
+                    if 200 <= event.pos[1] <= 240:
+                        self.active_field = "user"
+                    elif 260 <= event.pos[1] <= 300:
+                        self.active_field = "pass"
+                    else:
+                        self.active_field = None
+
+            if event.type == py.KEYDOWN and self.active_field:
+                if event.key == py.K_BACKSPACE:
+                    if self.active_field == "user":
+                        self.username = self.username[:-1]
+                    else:
+                        self.password = self.password[:-1]
+                else:
+                    char = event.unicode
+                    if self.active_field == "user":
+                        self.username += char
+                    else:
+                        self.password += char
+
+            self.login_button.handle_event(event)
+            self.register_button.handle_event(event)
+class LoginRegisterScreen:
+    def __init__(self, screen, font, gameStateManager):
+        self.screen = screen
+        self.font = font
+        self.gameStateManager = gameStateManager
+
+        self.username = ""
+        self.password = ""
+        self.active_field = None
+        self.message = ""
+
+        cx = WINDOW_WIDTH // 2 - 200
+        self.login_button = Button(
+            (cx, 350, 400, 60), "Login",
+            callback=self.login_user, fontsize=40
+        )
+        self.register_button = Button(
+            (cx, 430, 400, 60), "Register",
+            callback=self.register_user, fontsize=40
+        )
+
+    def login_user(self):
+        from .db import authenticate_user, get_user_id
+        if authenticate_user(self.username, self.password):
+            self.gameStateManager.player_username = self.username
+            self.gameStateManager.player_id = get_user_id(self.username)
+            self.gameStateManager.set_current_state("Main Menu")
+        else:
+            self.message = "Invalid username or password"
+
+    def register_user(self):
+        from .db import create_user
+        try:
+            create_user(self.username, self.password)
+            self.message = "Account created — login now."
+        except:
+            self.message = "Username already exists."
+
+    def draw_textbox(self, x, y, w, h, text, active):
+        color = (255,255,255) if active else (180,180,180)
+        py.draw.rect(self.screen, color, (x,y,w,h))
+        rendered = self.font.render(text, True, (0,0,0))
+        self.screen.blit(rendered, (x+5, y+5))
+
+    def run(self):
+        self.screen.fill((20,20,20))
+
+        # Textboxes
+        self.draw_textbox(300, 180, 450, 45, self.username, self.active_field=="user")
+        self.draw_textbox(300, 240, 450, 45, "*"*len(self.password), self.active_field=="pass")
+
+        msg = self.font.render(self.message, True, (255,120,120))
+        self.screen.blit(msg, (300, 300))
+
+        self.login_button.draw(self.screen)
+        self.register_button.draw(self.screen)
+
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                py.quit(); sys.exit()
+
+            # focus fields
+            if event.type == py.MOUSEBUTTONDOWN:
+                mx, my = event.pos
+                if 300 <= mx <= 750:
+                    if 180 <= my <= 225:
+                        self.active_field = "user"
+                    elif 240 <= my <= 285:
+                        self.active_field = "pass"
+                    else:
+                        self.active_field = None
+
+            # typing
+            if event.type == py.KEYDOWN and self.active_field:
+                if event.key == py.K_BACKSPACE:
+                    if self.active_field == "user":
+                        self.username = self.username[:-1]
+                    else:
+                        self.password = self.password[:-1]
+                else:
+                    if self.active_field == "user":
+                        self.username += event.unicode
+                    else:
+                        self.password += event.unicode
+
+            self.login_button.handle_event(event)
+            self.register_button.handle_event(event)
 
 # first game menu screen
 # option to load or start a new game
@@ -233,7 +420,19 @@ class StartGame():
     """ def next_sem(self):
         if self.semester < 8 and len(self.tasks) == 0:
             self.semester += 1 """
-    
+    def find_popup_by_name(self, name):
+        # Search minor events
+        for e in minor_events:
+            if e.title == name:
+                return e
+
+        # Search major events
+        for e in major_events:
+            if e.title == name:
+                return e
+
+        return None
+
     def next_sem(self):
         if len(self.tasks) == 0:
             self.semester += 1
@@ -272,6 +471,52 @@ class StartGame():
             self.player_input["up"] = value or key == py.K_w
         elif key == py.K_DOWN:
             self.player_input["down"] = value or key == py.K_s
+    
+    def apply_loaded_metrics(self, metrics):
+        self.metrics.budget = metrics["score"]
+        self.semester = 1 
+
+    def recreate_task_buttons(self, popup_dicts):
+        self.tasks = []
+        y_offset = 150
+
+        for p in popup_dicts:
+            popup_obj = self.find_popup_by_name(p["name"])
+
+            if popup_obj is None:
+                continue  # skip unknown
+
+            btn = Button(
+                dimensions=(20, y_offset, self.panel_width - 40, 50),
+                text=popup_obj.title,
+                callback=lambda e=popup_obj: self.open_popup(e),
+                base_color=BUTTON_COLOR,
+                hover_color=BUTTON_HOVER,
+                text_color=TEXT_COLOR
+            )
+
+            self.tasks.append(btn)
+            y_offset += 60
+
+    def auto_save_on_exit(self):
+        from .db import save_game_for_user
+        player_id = self.gameStateManager.player_id
+
+        # collect data
+        metrics = { "score": self.metrics.budget, "time_of_year": "Fall" }
+        buildings = self.menu_manager.get_building_levels()
+
+        # convert tasks to popup dicts
+        popups = []
+        for btn in self.tasks:
+            popups.append({
+                "name": btn.text,
+                "is_active": True,
+                "already_completed": False
+            })
+
+        save_game_for_user(player_id, metrics, buildings, popups)
+        print("Auto-save completed for player", player_id)
 
     # playing game loop
     def run(self):
@@ -318,6 +563,8 @@ class StartGame():
         # event handling logic
         for event in py.event.get():
             if event.type == py.QUIT:
+                print("Detected window close — auto-saving game...")
+                self.auto_save_on_exit()
                 py.quit()
                 sys.exit()
             if event.type == py.KEYDOWN:
@@ -566,15 +813,39 @@ class LoadGame():
     
     # FIXME add propoer functionality for SQL
     def load_game(self):
-        self.start.game_state.load()
+        from .db import load_full_state
+        print("LOAD GAME CLICKED")
 
-        # Update StartGame attributes
-        self.start.metrics.budget = self.start.game_state.score
-        self.start.menu_manager.set_building_levels(self.start.game_state.buildings)
-        self.start.tasks = self.start.game_state.popups
-        
-        # read a user inputted file
-        self.start.player = None #placeholder, data should come from the database
+        player_id = self.gameStateManager.player_id
+        state = load_full_state(player_id)
+
+        if not state:
+            return
+
+        # Restore semester
+        self.start.semester = state["semester"]
+
+        # Restore metrics
+        m = state["metrics"]
+        self.start.metrics.budget = m["budget"]
+        self.start.metrics.prestige = m["prestige"]
+        self.start.metrics.sHappiness = m["student_happiness"]
+        self.start.metrics.aHappiness = m["admin_happiness"]
+        self.start.metrics.security = m["security"]
+        self.start.metrics.academics = m["academics"]
+
+        # Restore buildings
+        self.start.menu_manager.set_building_levels(state["buildings"])
+
+        # Restore tasks
+        self.start.recreate_task_buttons([
+            {"name": name, "is_active": True, "already_completed": False}
+            for name in state["tasks"]
+        ])
+
+        # Switch to the game
+        self.gameStateManager.set_current_state("Start Game")
+
 
     def run(self):
         self.screen.fill(BLACK)
@@ -629,42 +900,28 @@ class InGameMenu():
     
     # FIXME - (needs to be sql, was just testing functionality with this)
     def save_game(self):
+        print("SAVE GAME CLICKED")
+        player_id = self.gameStateManager.player_id
 
-        self.start.game_state.score = self.start.metrics.budget
-        self.start.game_state.time_of_year = "Fall" 
-        self.start.game_state.buildings = self.start.menu_manager.get_building_levels()
-        self.start.game_state.popups = self.start.tasks
+        state = {
+            "semester": self.start.semester,
+            "metrics": {
+                "budget": self.start.metrics.budget,
+                "prestige": self.start.metrics.prestige,
+                "student_happiness": self.start.metrics.sHappiness,
+                "admin_happiness": self.start.metrics.aHappiness,
+                "security": self.start.metrics.security,
+                "academics": self.start.metrics.academics
+            },
+            "buildings": self.start.menu_manager.get_building_levels(),
+            "tasks": [btn.text for btn in self.start.tasks]
+        }
 
-        # Save to database
-        self.start.game_state.save()
+        from .db import save_full_state
+        save_full_state(player_id, state)
+        print("Game saved to database for player", player_id)
 
-        try:
-            ## FIXME need to make sure everything (metrics, etc) are ALL being saved
-            data = {
-                "player": {
-                    "x": self.start.player_x,
-                    "y": self.start.player_y,
-                },
-                "player_velocity": self.start.player_velocity,
-                "tasks": getattr(self.start.tasks),
-                "budget": getattr(self.start.budget),
-                "admins": len(self.start.admins),
-                "students": len(self.start.students)
-            }
 
-            #NEW ADD BY RAAGHUV
-            save_path = self.get_save_path()
-
-            #COMMENTED OUT BY RAAGHUV
-            #save_path = os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
-            with open(save_path, "w") as f:
-                json.dump(data, f, indent=4) ## FIXME change to db.execute or something (for sql compatability)
-
-            print(f"Game saved successfully to {save_path}")
-
-        except Exception as e:
-            print("Error saving game:", e)
-            
     #NEWLY ADDED BY RAAGHUV FOR TESTING RECURSION PROBLEM        
     def get_save_path(self):
         return os.path.join(os.path.expanduser("~"), "Desktop", "save_game.json")
@@ -688,11 +945,14 @@ class InGameMenu():
                 sys.exit()
             self.save_button.handle_event(event)
             self.close_button.handle_event(event)
+        return 
 
 # manages state switching logic
 class GameStateManager:
     def __init__(self, current_state):
         self.current_state = current_state
+        self.player_username = None
+        self.player_id = None
 
     def get_current_state(self):
         return self.current_state
