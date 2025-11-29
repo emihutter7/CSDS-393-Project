@@ -317,6 +317,7 @@ class StartGame():
         self.budget = 100000
         self.tasks = [] # was thinking a list of buttons that will cause popup to open
         self.semester = 1
+        self.turn = self.game_state.max_turns
         self.help_button = Button(dimensions=(WINDOW_WIDTH - 125, 20, 120, 40), # dimensions should be x,y,width,height
                                   text="Help",
                                   callback=lambda: self.gameStateManager.set_current_state("In-Game Menu"),
@@ -434,23 +435,18 @@ class StartGame():
         return None
 
     def next_sem(self):
+
         # Only allow next turn if no active tasks
         if len(self.tasks) > 0:
             print("Finish all tasks before advancing!")
             return
 
-        # Increment turn
-        self.turn += 1
-        print(f"Turn {self.turn} completed.")
+        # Advance turn via GameState
+        game_over = self.game_state.next_turn()
+        self.semester = (self.game_state.turn + 1) // 2  # display semester
 
-        # Update semester every 2 turns
-        if self.turn % 2 == 0:
-            self.semester += 1
-            print(f"Semester advanced to {self.semester}.")
-
-        # Check for game over
-        if self.turn >= self.max_turns:
-            print("Game Over!")
+        # Check if game is over
+        if game_over:
             self.show_final_score_screen()
             return
 
