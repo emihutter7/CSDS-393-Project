@@ -81,7 +81,7 @@ class LoginRegisterScreen:
         center_y = WINDOW_HEIGHT // 2
 
         self.login_button = Button(
-            dimensions=(center_x, center_y + 80, button_width, button_height),
+            dimensions=(center_x - button_width // 2, center_y + 80, button_width, button_height),
             text="Login",
             callback=self.login_user,
             fontsize=40
@@ -123,11 +123,19 @@ class LoginRegisterScreen:
         title = self.font.render("User Login", True, WHITE)
         self.screen.blit(title, (WINDOW_WIDTH//2 - 60, 80))
 
-        self.draw_textbox(500, 200, 400, 40, self.username, self.active_field=="user")
-        self.draw_textbox(500, 260, 400, 40, "*"*len(self.password), self.active_field=="pass")
+        textbox_width = 250
+        textbox_height = 70
+        top_left_x = WINDOW_WIDTH // 2 - textbox_width // 2
+        start_y = 200  # y for username
+
+        self.draw_textbox(top_left_x, start_y, textbox_width, textbox_height, self.username, self.active_field=="user")
+        self.draw_textbox(top_left_x, start_y + 60, textbox_width, textbox_height, "*"*len(self.password), self.active_field=="pass")
+
+        #self.draw_textbox(500, 200, 400, 40, self.username, self.active_field=="user")
+       # self.draw_textbox(500, 260, 400, 40, "*"*len(self.password), self.active_field=="pass")
 
         msg = self.font.render(self.message, True, (255,100,100))
-        self.screen.blit(msg, (300, 320))
+        self.screen.blit(msg, (top_left_x, 320))
 
         self.login_button.draw(self.screen)
         self.register_button.draw(self.screen)
@@ -160,6 +168,7 @@ class LoginRegisterScreen:
 
             self.login_button.handle_event(event)
             self.register_button.handle_event(event)
+
 class LoginRegisterScreen:
     def __init__(self, screen, font, gameStateManager):
         self.screen = screen
@@ -207,12 +216,21 @@ class LoginRegisterScreen:
     def run(self):
         self.screen.fill((20,20,20))
 
+        textbox_width = 400
+        textbox_height = 40
+        top_left_x = WINDOW_WIDTH // 2 - 200
+        start_y = 200  # y for username
+
+        self.draw_textbox(top_left_x, start_y, textbox_width, textbox_height, self.username, self.active_field=="user")
+        self.draw_textbox(top_left_x, start_y + 60, textbox_width, textbox_height, "*"*len(self.password), self.active_field=="pass")
+
+
         # Textboxes
-        self.draw_textbox(300, 180, 450, 45, self.username, self.active_field=="user")
-        self.draw_textbox(300, 240, 450, 45, "*"*len(self.password), self.active_field=="pass")
+        #self.draw_textbox(300, 180, 450, 45, self.username, self.active_field=="user")
+        #self.draw_textbox(300, 240, 450, 45, "*"*len(self.password), self.active_field=="pass")
 
         msg = self.font.render(self.message, True, (255,120,120))
-        self.screen.blit(msg, (300, 300))
+        self.screen.blit(msg, (top_left_x, 300))
 
         self.login_button.draw(self.screen)
         self.register_button.draw(self.screen)
@@ -333,7 +351,7 @@ class StartGame():
         # if we put all images in the images folder, the relative directory will be easier to follow
         # dimensions should be x,y,width,height
         self.building_data = [
-            ("NRV Dorms", lambda : self.show_building_menu("NRV Dorms"), (370, 120, 80, 80), resource_path("images/testing2.png")),
+            ("NRV Dorms", lambda : self.show_building_menu("NRV Dorms"), (370, 120, 80, 80), "../images/testing2.png"),
             ("Leut.", lambda : self.show_building_menu("Leutner"), (400, 70, 50, 50)),
             ("Wyant", lambda : self.show_building_menu("Wyant"), (500, 20, 50, 50)),
 
@@ -744,6 +762,43 @@ class StartGame():
 
     def open_popup(self, event):
         self.active_popup = event
+    
+    def _wrap_text(self, surface, text, font, x, y, max_width):
+        words = text.split(" ")
+        lines = []
+        current_line = ""
+
+        for word in words:
+            test_line = current_line + (" " if current_line else "") + word
+
+            # case 1: fits normally
+            if font.size(test_line)[0] <= max_width:
+                current_line = test_line
+
+            else:
+                # case 2: current line exists → push it and start new line
+                if current_line:
+                    lines.append(current_line)
+                    current_line = word
+                else:
+                    # case 3: long single word — force break character-by-character
+                    split_word = ""
+                    for ch in word:
+                        if font.size(split_word + ch)[0] <= max_width:
+                            split_word += ch
+                        else:
+                            lines.append(split_word)
+                            split_word = ch
+                    current_line = split_word
+
+        if current_line:
+            lines.append(current_line)
+
+                    # Draw the lines
+        for line in lines:
+            text_surface = font.render(line, True, TEXT_COLOR)
+            surface.blit(text_surface, (x, y))
+            y += font.get_linesize()
 
     def draw_popup(self):
         popup = self.active_popup
@@ -756,8 +811,16 @@ class StartGame():
         # draw title & description
         title_surf = self.font.render(popup.title, True, TEXT_COLOR)
         desc_surf = self.font.render(popup.description, True, TEXT_COLOR)
+
+        self._wrap_text(surface=self.screen, 
+                        text=popup.description, 
+                        font=py.font.Font(None, 24), 
+                        x=rect.x + 20, 
+                        y=rect.y + 60, 
+                        max_width=rect.width - 60)
+        
         self.screen.blit(title_surf, (rect.x + 20, rect.y + 20))
-        self.screen.blit(desc_surf, (rect.x + 20, rect.y + 60))
+        #self.screen.blit(desc_surf, (rect.x + 20, rect.y + 60))
 
         # draw choices as buttons
         self.choice_buttons = []

@@ -93,7 +93,45 @@ class Menu:
                                        base_color=BG_COLOR, 
                                        hover_color=GRAY, 
                                        text_color=BLACK)
+            
+    def _wrap_text(self, surface, text, font, x, y, max_width):
+        words = text.split(" ")
+        lines = []
+        current_line = ""
+
+        for word in words:
+            test_line = current_line + (" " if current_line else "") + word
+
+            # case 1: fits normally
+            if font.size(test_line)[0] <= max_width:
+                current_line = test_line
+
+            else:
+                # case 2: current line exists → push it and start new line
+                if current_line:
+                    lines.append(current_line)
+                    current_line = word
+                else:
+                    # case 3: long single word — force break character-by-character
+                    split_word = ""
+                    for ch in word:
+                        if font.size(split_word + ch)[0] <= max_width:
+                            split_word += ch
+                        else:
+                            lines.append(split_word)
+                            split_word = ch
+                    current_line = split_word
+
+        if current_line:
+            lines.append(current_line)
+
+        # Draw the lines
+        for line in lines:
+            text_surface = font.render(line, True, TEXT_COLOR)
+            surface.blit(text_surface, (x, y))
+            y += font.get_linesize()
     
+    '''
     # so that the text wraps around and is not cut off if too long
     def _wrap_text(self, surface, text, font, x, y, max_width):
 
@@ -119,7 +157,7 @@ class Menu:
                          dest=(x, y))
             
             y += font.get_linesize()
-
+            '''
     # so that the whole menu container shows up on the screen
     def draw(self, surface):
         
