@@ -335,6 +335,7 @@ class StartGame():
         self.budget = 100000
         self.tasks = [] # was thinking a list of buttons that will cause popup to open
         self.semester = 1
+        self.turn = self.game_state.max_turns
         self.help_button = Button(dimensions=(WINDOW_WIDTH - 125, 20, 120, 40), # dimensions should be x,y,width,height
                                   text="Help",
                                   callback=lambda: self.gameStateManager.set_current_state("In-Game Menu"),
@@ -452,9 +453,103 @@ class StartGame():
         return None
 
     def next_sem(self):
-        if len(self.tasks) == 0:
-            self.semester += 1
-            self.generate_tasks()
+
+        # Only allow next turn if no active tasks
+        if len(self.tasks) > 0:
+            print("Finish all tasks before advancing!")
+            return
+
+        # Advance turn via GameState
+        game_over = self.game_state.next_turn()
+        self.semester = (self.game_state.turn + 1) // 2  # display semester
+
+        # Check if game is over
+        if game_over:
+            self.show_final_score_screen()
+            return
+
+        # Otherwise, generate new tasks
+        self.generate_tasks()
+
+    def show_final_score_screen(self):
+        print(self.metrics.budget)
+
+        weights = {
+            "budget": 0.25,
+            "prestige": 0.25,
+            "sHappiness": 0.2,
+            "aHappiness": 0.15,
+            "security": 0.1,
+            "academics": 0.1
+        }
+
+        # Compute normalized deltas
+        delta_budget     = (self.metrics.budget - 450000000) / 450000000
+        delta_prestige   = (self.metrics.prestige - 51) / 51
+        delta_sHappiness = (self.metrics.sHappiness - 75) / 75
+        delta_aHappiness = (self.metrics.aHappiness - 60) / 60
+        delta_security   = (self.metrics.security - 50) / 50
+        delta_academics  = (self.metrics.academics - 80) / 80
+
+        # Weighted contributions
+        contributions = {
+            "budget": delta_budget * weights["budget"] * 100,
+            "prestige": delta_prestige * weights["prestige"] * 100,
+            "sHappiness": delta_sHappiness * weights["sHappiness"] * 100,
+            "aHappiness": delta_aHappiness * weights["aHappiness"] * 100,
+            "security": delta_security * weights["security"] * 100,
+            "academics": delta_academics * weights["academics"] * 100
+        }
+
+        # Total final score
+        total_score = sum(contributions.values())
+        
+        text = f"Game Over!   Your final score: {total_score:.2f}"
+
+        # Build a nice text display
+        lines = [f"Game Over!  Your final score: {total_score:.2f}\n"]
+        for metric, value in contributions.items():
+            lines.append(f"{metric}: {value:.2f}")
+
+        #text = "\n".join(lines)
+
+        menu = Menu(
+            menu_manager=self.menu_manager,
+            title="Game Over",
+            text=text,
+            user_options=[("EXIT", lambda: exit())],  # or return to main menu
+            user_closable=False
+        )
+
+        self.menu_manager.open_menu(menu)
+
+
+    #not used anywhere
+    def show_game_over_screen(self):
+        # disable other buttons
+        self.next_turn_button.callback = lambda: None
+
+        final_text = (
+            f"Game Over!\n\n"
+            f"Semester: {self.semester}\n"
+            f"Budget: {self.metrics.budget}\n"
+            f"Prestige: {self.metrics.prestige}\n"
+            f"Student Happiness: {self.metrics.sHappiness}\n"
+            f"Professor Happiness: {self.metrics.aHappiness}\n"
+            f"Security: {self.metrics.security}\n"
+            f"Academics: {self.metrics.academics}"
+        )
+
+        game_over_menu = Menu(
+            menu_manager=self.menu_manager,
+            title="GAME OVER",
+            text=final_text,
+            user_options=[("Exit", exit_game)]  # exit_game should quit pygame or return to main menu
+        )
+
+        self.menu_manager.open_menu(game_over_menu)
+
+    
 
     # generic building menu
     def show_building_menu(self, building_name):

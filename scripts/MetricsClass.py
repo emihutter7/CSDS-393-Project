@@ -74,4 +74,4 @@ class Metrics:
         if value < 0:
             raise ValueError("Academics cannot be negative.")
         self._academics = value
-    
+
