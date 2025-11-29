@@ -74,38 +74,4 @@ class Metrics:
         if value < 0:
             raise ValueError("Academics cannot be negative.")
         self._academics = value
-    
-    def calculate_final_score(self):
-        # Define weights for each metric
-        weights = {
-            "budget": 0.25,
-            "prestige": 0.25,
-            "sHappiness": 0.2,
-            "aHappiness": 0.15,
-            "security": 0.1,
-            "academics": 0.1
-        }
-
-        # Compute normalized deltas
-        delta_budget     = (self.metrics.budget - self._budget) / self._budget
-        delta_prestige   = (self.metrics.prestige - self._prestige) / self._prestige
-        delta_sHappiness = (self.metrics.sHappiness - self._sHappiness) / self._sHappiness
-        delta_aHappiness = (self.metrics.aHappiness - self._aHappiness) / self._aHappiness
-        delta_security   = (self.metrics.security - self._security) / self._security
-        delta_academics  = (self.metrics.academics - self._academics) / self._academics
-
-        # Weighted sum of normalized deltas
-        score = (
-            delta_budget * weights["budget"] +
-            delta_prestige * weights["prestige"] +
-            delta_sHappiness * weights["sHappiness"] +
-            delta_aHappiness * weights["aHappiness"] +
-            delta_security * weights["security"] +
-            delta_academics * weights["academics"]
-        )
-
-        # Optional: scale to a nicer number, e.g., multiply by 100
-        score *= 100
-
-        return score
 

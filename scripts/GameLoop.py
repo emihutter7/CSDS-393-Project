@@ -454,10 +454,47 @@ class StartGame():
         self.generate_tasks()
 
     def show_final_score_screen(self):
-        final_score = self.calculate_final_score()
+        print(self.metrics.budget)
+
+        weights = {
+            "budget": 0.25,
+            "prestige": 0.25,
+            "sHappiness": 0.2,
+            "aHappiness": 0.15,
+            "security": 0.1,
+            "academics": 0.1
+        }
+
+        # Compute normalized deltas
+        delta_budget     = (self.metrics.budget - 450000000) / 450000000
+        delta_prestige   = (self.metrics.prestige - 51) / 51
+        delta_sHappiness = (self.metrics.sHappiness - 75) / 75
+        delta_aHappiness = (self.metrics.aHappiness - 60) / 60
+        delta_security   = (self.metrics.security - 50) / 50
+        delta_academics  = (self.metrics.academics - 80) / 80
+
+        # Weighted contributions
+        contributions = {
+            "budget": delta_budget * weights["budget"] * 100,
+            "prestige": delta_prestige * weights["prestige"] * 100,
+            "sHappiness": delta_sHappiness * weights["sHappiness"] * 100,
+            "aHappiness": delta_aHappiness * weights["aHappiness"] * 100,
+            "security": delta_security * weights["security"] * 100,
+            "academics": delta_academics * weights["academics"] * 100
+        }
+
+        # Total final score
+        total_score = sum(contributions.values())
         
-        text = f"Game Over!\nYour final score: {final_score:.2f}"
-        
+        text = f"Game Over!   Your final score: {total_score:.2f}"
+
+        # Build a nice text display
+        lines = [f"Game Over!  Your final score: {total_score:.2f}\n"]
+        for metric, value in contributions.items():
+            lines.append(f"{metric}: {value:.2f}")
+
+        #text = "\n".join(lines)
+
         menu = Menu(
             menu_manager=self.menu_manager,
             title="Game Over",
@@ -465,8 +502,9 @@ class StartGame():
             user_options=[("EXIT", lambda: exit())],  # or return to main menu
             user_closable=False
         )
-        
+
         self.menu_manager.open_menu(menu)
+
 
     #not used anywhere
     def show_game_over_screen(self):
