@@ -1,7 +1,6 @@
 import sys
 import pygame as py
 import random
-import json
 import os
 
 # from scripts.db import db_init
@@ -435,10 +434,6 @@ class StartGame():
         self.generate_tasks()
         
     
-    # FIXME need some way to make sure that it notifies user that you can't use it if task is not empty
-    """ def next_sem(self):
-        if self.semester < 8 and len(self.tasks) == 0:
-            self.semester += 1 """
     def find_popup_by_name(self, name):
         # Search minor events
         for e in minor_events:
@@ -591,7 +586,7 @@ class StartGame():
 
     def recreate_task_buttons(self, popup_dicts):
         self.tasks = []
-        y_offset = 150
+        y_offset = 40
 
         for p in popup_dicts:
             popup_obj = self.find_popup_by_name(p["name"])
@@ -638,14 +633,14 @@ class StartGame():
 
         # Left-side panels
         # --- Budget panel ---
-        py.draw.rect(self.screen, PANEL_COLOR, (0, 0, self.panel_width, 100))
-        py.draw.rect(self.screen, BORDER_COLOR, (0, 0, self.panel_width, 100), width=3)
-        self.screen.blit(self.font.render("Budget", True, TEXT_COLOR), (15, 15))
+        #py.draw.rect(self.screen, PANEL_COLOR, (0, 0, self.panel_width, 100))
+        #py.draw.rect(self.screen, BORDER_COLOR, (0, 0, self.panel_width, 100), width=3)
+        #self.screen.blit(self.font.render("Budget", True, TEXT_COLOR), (15, 15))
 
         # --- Tasks panel ---
-        py.draw.rect(self.screen, PANEL_COLOR, (0, 100, self.panel_width, 500))
-        py.draw.rect(self.screen, BORDER_COLOR, (0, 100, self.panel_width, 500), width=3)
-        self.screen.blit(self.font.render("Tasks", True, TEXT_COLOR), (15, 110))
+        py.draw.rect(self.screen, PANEL_COLOR, (0, 0, self.panel_width, 600))
+        py.draw.rect(self.screen, BORDER_COLOR, (0, 0, self.panel_width, 600), width=3)
+        self.screen.blit(self.font.render("Tasks", True, TEXT_COLOR), (15, 15))
 
         # --- Semester panel ---
         semester_panel_y = 600
@@ -842,7 +837,7 @@ class StartGame():
         else:                        # end of semester
             tasks_to_add = random.sample(minor_events, 1) + random.sample(major_events, 1)
 
-        y_offset = 150
+        y_offset = 40
         for event in tasks_to_add:
             btn = Button(
                 dimensions=(20, y_offset, self.panel_width - 40, 50),

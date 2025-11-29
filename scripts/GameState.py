@@ -10,7 +10,7 @@ class GameState:
         self.time_of_year = "Fall"
         self.buildings = {}
         self.popups = []
-        self.turn = 0                 
+        self.turn = 1                 
         self.max_turns = 16
 
     def load(self):
