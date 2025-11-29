@@ -570,7 +570,7 @@ class StartGame():
         for label, value in [
             ("Budget", f"${self.metrics.budget:,}"),
             ("Prestige", self.metrics.prestige),
-            ("Student Happiness", self.metrics.sHappiness),
+            ("Stud. Happiness", self.metrics.sHappiness),
             ("Admin Happiness", self.metrics.aHappiness),
             ("Security", self.metrics.security),
             ("Academics", self.metrics.academics)

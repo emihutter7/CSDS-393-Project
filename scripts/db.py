@@ -1,6 +1,6 @@
 import psycopg2
 from .config import DATABASE_CONFIGURATION
-import bcrypt 
+import bcrypt
 
 # Access database
 def get_connection():
