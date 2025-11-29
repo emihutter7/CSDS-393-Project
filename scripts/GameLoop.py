@@ -434,9 +434,70 @@ class StartGame():
         return None
 
     def next_sem(self):
-        if len(self.tasks) == 0:
+        # Only allow next turn if no active tasks
+        if len(self.tasks) > 0:
+            print("Finish all tasks before advancing!")
+            return
+
+        # Increment turn
+        self.turn += 1
+        print(f"Turn {self.turn} completed.")
+
+        # Update semester every 2 turns
+        if self.turn % 2 == 0:
             self.semester += 1
-            self.generate_tasks()
+            print(f"Semester advanced to {self.semester}.")
+
+        # Check for game over
+        if self.turn >= self.max_turns:
+            print("Game Over!")
+            self.show_final_score_screen()
+            return
+
+        # Otherwise, generate new tasks
+        self.generate_tasks()
+
+    def show_final_score_screen(self):
+        final_score = self.calculate_final_score()
+        
+        text = f"Game Over!\nYour final score: {final_score:.2f}"
+        
+        menu = Menu(
+            menu_manager=self.menu_manager,
+            title="Game Over",
+            text=text,
+            user_options=[("EXIT", lambda: exit())],  # or return to main menu
+            user_closable=False
+        )
+        
+        self.menu_manager.open_menu(menu)
+
+    #not used anywhere
+    def show_game_over_screen(self):
+        # disable other buttons
+        self.next_turn_button.callback = lambda: None
+
+        final_text = (
+            f"Game Over!\n\n"
+            f"Semester: {self.semester}\n"
+            f"Budget: {self.metrics.budget}\n"
+            f"Prestige: {self.metrics.prestige}\n"
+            f"Student Happiness: {self.metrics.sHappiness}\n"
+            f"Professor Happiness: {self.metrics.aHappiness}\n"
+            f"Security: {self.metrics.security}\n"
+            f"Academics: {self.metrics.academics}"
+        )
+
+        game_over_menu = Menu(
+            menu_manager=self.menu_manager,
+            title="GAME OVER",
+            text=final_text,
+            user_options=[("Exit", exit_game)]  # exit_game should quit pygame or return to main menu
+        )
+
+        self.menu_manager.open_menu(game_over_menu)
+
+    
 
     # generic building menu
     def show_building_menu(self, building_name):
