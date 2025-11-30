@@ -312,3 +312,11 @@ class MenuManager:
 
     def set_building_levels(self, levels_dict):
         self.building_levels = dict(levels_dict)
+
+        # Update button labels and level attributes to match loaded state
+        for button in self.main_buttons:
+            name = getattr(button, "original_name", button.text)
+            if name in self.building_levels:
+                new_level = self.building_levels[name]
+                button.level = new_level
+                button.text = f"{name} {new_level}" if new_level > 1 else name

@@ -400,6 +400,7 @@ class StartGame():
 
             # Set initial level
             button.level = 1
+            self.menu_manager.building_levels[button.original_name] = button.level
 
             # Fix the callback so it knows which button it belongs to
             button.callback = lambda b=button: self.show_building_menu(b)
@@ -494,10 +495,12 @@ class StartGame():
 
         # currently no popup open, will store temporary popup choice buttons
         self.active_popup = None       
+        self.popup_context = None  # metadata about the current popup (e.g., task vs year-end)
         self.choice_buttons = []
 
         #metrics initializing
         self.metrics = Metrics()
+        self.year_start_metrics = self._metrics_snapshot()
         self.generate_tasks()
         
     
@@ -529,6 +532,10 @@ class StartGame():
         if game_over:
             self.show_final_score_screen()
             return
+
+        # Year-end (every 4 turns) triggers a major event popup with metrics summary
+        if self.game_state.turn % 4 == 0:
+            self.show_year_end_popup()
 
         # Otherwise, generate new tasks
         self.generate_tasks()
@@ -624,6 +631,8 @@ class StartGame():
             if b.level < 3:
                 b.level += 1
                 b.text = f"{b.original_name} {b.level}"
+                self.menu_manager.building_levels[b.original_name] = b.level
+                self._apply_building_upgrade_effects()
             # re-open menu so title updates
             self.menu_manager.close_menu()
             self.show_building_menu(b)
@@ -928,6 +937,16 @@ class StartGame():
 
     def open_popup(self, event):
         self.active_popup = event
+        self.popup_context = {"type": "task"}
+
+    def show_year_end_popup(self):
+        # pick a major event to present as the year-end choice
+        event = random.choice(major_events)
+        self.active_popup = event
+        self.popup_context = {
+            "type": "year_end",
+            "year_number": ((self.game_state.turn - 1) // 4) + 1
+        }
     
     def _wrap_text(self, surface, text, font, x, y, max_width):
         words = text.split(" ")
@@ -966,11 +985,62 @@ class StartGame():
             surface.blit(text_surface, (x, y))
             y += font.get_linesize()
 
+    def _render_metric_deltas(self, rect, start_y=None, include_header=False):
+        """
+        Render current metrics and delta since year start inside the popup rect.
+        Returns the next y position to continue drawing (after the summary block).
+        """
+        if not self.year_start_metrics:
+            return (start_y or rect.y + 160)
+
+        font = py.font.Font(None, 22)
+        header_font = py.font.Font(None, 26)
+        y = start_y if start_y is not None else (rect.y + 140)
+
+        if include_header:
+            header = header_font.render("End of Year Metrics Summary", True, TEXT_COLOR)
+            self.screen.blit(header, (rect.x + 20, y))
+            y += header_font.get_linesize() + 6
+        lines = []
+        current = {
+            "budget": self.metrics.budget,
+            "prestige": self.metrics.prestige,
+            "sHappiness": self.metrics.sHappiness,
+            "aHappiness": self.metrics.aHappiness,
+            "security": self.metrics.security,
+            "academics": self.metrics.academics
+        }
+
+        for key, label in [
+            ("budget", "Budget"),
+            ("prestige", "Prestige"),
+            ("sHappiness", "Stud. Happiness"),
+            ("aHappiness", "Admin Happiness"),
+            ("security", "Security"),
+            ("academics", "Academics")
+        ]:
+            start_val = self.year_start_metrics.get(key, 0)
+            delta = current[key] - start_val
+            if key == "budget":
+                current_str = f"${current[key]:,}"
+                delta_str = f"{'+' if delta >= 0 else ''}${delta:,}"
+            else:
+                current_str = str(current[key])
+                delta_str = f"{'+' if delta >= 0 else ''}{delta}"
+            lines.append(f"{label}: {current_str} ({delta_str})")
+
+        for line in lines:
+            text_surface = font.render(line, True, TEXT_COLOR)
+            self.screen.blit(text_surface, (rect.x + 20, y))
+            y += font.get_linesize() + 2
+
+        return y + 10
+
     def draw_popup(self):
         popup = self.active_popup
         if not popup:
             return
-        rect = py.Rect(WINDOW_WIDTH//2 - 300, WINDOW_HEIGHT//2 - 200, 600, 400)
+        rect = py.Rect(WINDOW_WIDTH//2 - 320, WINDOW_HEIGHT//2 - 250, 640, 500)
         py.draw.rect(self.screen, PANEL_COLOR, rect)
         py.draw.rect(self.screen, BORDER_COLOR, rect, 3)
 
@@ -984,13 +1054,15 @@ class StartGame():
                         x=rect.x + 20, 
                         y=rect.y + 60, 
                         max_width=rect.width - 60)
-        
+
         self.screen.blit(title_surf, (rect.x + 20, rect.y + 20))
         #self.screen.blit(desc_surf, (rect.x + 20, rect.y + 60))
 
-        # draw choices as buttons
+        # Set starting y for choices
         self.choice_buttons = []
         y = rect.y + 120
+
+        # draw choices as buttons
         for i, choice in enumerate(popup.choices):
             btn = Button(
                 dimensions=(rect.x + 100, y, 400, 40),
@@ -1004,11 +1076,53 @@ class StartGame():
             self.choice_buttons.append(btn)
             y += 60
 
+        # For year-end popups, render metric deltas below the choices with a header
+        if self.popup_context and self.popup_context.get("type") == "year_end":
+            self._render_metric_deltas(rect, start_y=y + 10, include_header=True)
+
     def choose_option(self, idx):
         self.active_popup.trigger_choice(idx, self.metrics)
-        # remove this task from task list
-        self.tasks = [t for t in self.tasks if t.text != self.active_popup.title]
+        # remove this task from task list if it came from tasks
+        if self.popup_context and self.popup_context.get("type") == "task":
+            self.tasks = [t for t in self.tasks if t.text != self.active_popup.title]
+
+        # After year-end, reset snapshot for the new year
+        if self.popup_context and self.popup_context.get("type") == "year_end":
+            self.year_start_metrics = self._metrics_snapshot()
+
         self.active_popup = None
+        self.popup_context = None
+
+    def _apply_building_upgrade_effects(self):
+        """
+        Apply immediate metric effects when a building is upgraded.
+        Defaults can be adjusted as needed.
+        """
+        budget_cost = -2_000_000
+        prestige_gain = 2
+        academics_gain = 2
+        student_hap_gain = 1
+        admin_hap_gain = 1
+        security_gain = 1
+
+        # Prevent negative budget crashes
+        new_budget = max(0, self.metrics.budget + budget_cost)
+        self.metrics.budget = new_budget
+        self.metrics.prestige += prestige_gain
+        self.metrics.academics += academics_gain
+        self.metrics.sHappiness += student_hap_gain
+        self.metrics.aHappiness += admin_hap_gain
+        self.metrics.security += security_gain
+
+    def _metrics_snapshot(self):
+        return {
+            "budget": self.metrics.budget,
+            "prestige": self.metrics.prestige,
+            "sHappiness": self.metrics.sHappiness,
+            "aHappiness": self.metrics.aHappiness,
+            "security": self.metrics.security,
+            "academics": self.metrics.academics
+        }
 
 
 # this is the loading screen - must prompt user to select a file off of desktop and load
@@ -1062,6 +1176,7 @@ class LoadGame():
         self.start.metrics.aHappiness = m["admin_happiness"]
         self.start.metrics.security = m["security"]
         self.start.metrics.academics = m["academics"]
+        self.start.year_start_metrics = self.start._metrics_snapshot()
 
         # Restore buildings
         self.start.menu_manager.set_building_levels(state["buildings"])

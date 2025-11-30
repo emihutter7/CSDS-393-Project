@@ -2,22 +2,45 @@ import psycopg2
 from .config import DATABASE_CONFIGURATION
 import bcrypt
 
+# Fallback in-memory storage if Postgres is unavailable.
+DB_AVAILABLE = True
+_fallback_users = {}
+_fallback_user_seq = 1
+_fallback_metrics = {"score": 0, "time_of_year": "Spring"}
+_fallback_buildings = {}
+_fallback_popups = []
+_fallback_user_metrics = {}
+_fallback_user_buildings = {}
+_fallback_user_popups = {}
+_fallback_user_state = {}
+_fallback_scores = []
+
 # Access database
 def get_connection():
-    connection = psycopg2.connect(
-        dbname = DATABASE_CONFIGURATION['dbname'],
-        user = DATABASE_CONFIGURATION['user'],
-        password = DATABASE_CONFIGURATION['password'],
-        host = DATABASE_CONFIGURATION['host'],
-        port = DATABASE_CONFIGURATION['port']
-    )
-    return connection
+    global DB_AVAILABLE
+    if not DB_AVAILABLE:
+        return None
+    try:
+        connection = psycopg2.connect(
+            dbname = DATABASE_CONFIGURATION['dbname'],
+            user = DATABASE_CONFIGURATION['user'],
+            password = DATABASE_CONFIGURATION['password'],
+            host = DATABASE_CONFIGURATION['host'],
+            port = DATABASE_CONFIGURATION['port']
+        )
+        return connection
+    except Exception as exc:
+        print("Postgres unavailable, using in-memory fallback. Error:", exc)
+        DB_AVAILABLE = False
+        return None
 
 # Creates all game tables if they don't yet exist
 def db_init():
     connection = get_connection()
-    curs = connection.cursor()
+    if connection is None:
+        return
 
+    curs = connection.cursor()
     curs.execute("""
     CREATE TABLE IF NOT EXISTS user_state (
         player_id INTEGER PRIMARY KEY REFERENCES users(player_id),
@@ -108,6 +131,11 @@ def db_init():
 
 def save_metrics(score, time_of_year):
     conn = get_connection()
+    if conn is None:
+        _fallback_metrics["score"] = score
+        _fallback_metrics["time_of_year"] = time_of_year
+        return
+
     cur = conn.cursor()
     cur.execute("DELETE FROM metrics")  # keep only one record
     cur.execute("INSERT INTO metrics (score, time_of_year) VALUES (%s, %s)",
@@ -118,6 +146,9 @@ def save_metrics(score, time_of_year):
 
 def load_metrics():
     conn = get_connection()
+    if conn is None:
+        return _fallback_metrics["score"], _fallback_metrics["time_of_year"]
+
     cur = conn.cursor()
     cur.execute("SELECT score, time_of_year FROM metrics LIMIT 1")
     row = cur.fetchone()
@@ -129,6 +160,10 @@ def load_metrics():
 
 def save_buildings(buildings):
     conn = get_connection()
+    if conn is None:
+        _fallback_buildings.update(buildings)
+        return
+
     cur = conn.cursor()
     for name, level in buildings.items():
         cur.execute("""
@@ -142,6 +177,9 @@ def save_buildings(buildings):
 
 def load_buildings():
     conn = get_connection()
+    if conn is None:
+        return dict(_fallback_buildings)
+
     cur = conn.cursor()
     cur.execute("SELECT name, level FROM buildings")
     rows = cur.fetchall()
@@ -153,6 +191,10 @@ def load_buildings():
 
 def save_popups(popups):
     conn = get_connection()
+    if conn is None:
+        _fallback_popups[:] = popups
+        return
+
     cur = conn.cursor()
     for popup in popups:
         cur.execute("""
@@ -168,6 +210,9 @@ def save_popups(popups):
 
 def load_popups():
     conn = get_connection()
+    if conn is None:
+        return list(_fallback_popups)
+
     cur = conn.cursor()
     cur.execute("SELECT name, is_active, already_completed FROM popups")
     rows = cur.fetchall()
@@ -181,8 +226,17 @@ def load_popups():
 # User authentication methods
 
 def create_user(username, password):
+    global _fallback_user_seq
     hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     conn = get_connection()
+    if conn is None:
+        if username in _fallback_users:
+            raise ValueError("Username already exists")
+        player_id = _fallback_user_seq
+        _fallback_user_seq += 1
+        _fallback_users[username] = {"hash": hashed.decode(), "player_id": player_id}
+        return player_id
+
     cur = conn.cursor()
     cur.execute(
         "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING player_id;",
@@ -196,6 +250,12 @@ def create_user(username, password):
 
 def authenticate_user(username, password):
     conn = get_connection()
+    if conn is None:
+        user = _fallback_users.get(username)
+        if not user:
+            return False
+        return bcrypt.checkpw(password.encode(), user["hash"].encode())
+
     cur = conn.cursor()
     cur.execute("SELECT password_hash FROM users WHERE username=%s;", (username,))
     row = cur.fetchone()
@@ -209,6 +269,10 @@ def authenticate_user(username, password):
 
 def save_score(player_id, score):
     conn = get_connection()
+    if conn is None:
+        _fallback_scores.append((player_id, score))
+        return
+
     cur = conn.cursor()
     cur.execute("INSERT INTO scores (player_id, score) VALUES (%s, %s);", (player_id, score))
     conn.commit()
@@ -217,6 +281,11 @@ def save_score(player_id, score):
 
 def get_high_scores(top_n=10):
     conn = get_connection()
+    if conn is None:
+        # In fallback, we don't have usernames for scores, so just return ids
+        sorted_scores = sorted(_fallback_scores, key=lambda x: x[1], reverse=True)[:top_n]
+        return [("player_"+str(pid), score) for pid, score in sorted_scores]
+
     cur = conn.cursor()
     cur.execute("""
         SELECT u.username, s.score
@@ -233,6 +302,10 @@ def get_high_scores(top_n=10):
 def get_user_id(username):
     """Return the player's ID for a given username, or None if not found."""
     conn = get_connection()
+    if conn is None:
+        user = _fallback_users.get(username)
+        return user["player_id"] if user else None
+
     cur = conn.cursor()
     cur.execute("SELECT player_id FROM users WHERE username = %s;", (username,))
     row = cur.fetchone()
@@ -244,6 +317,12 @@ def get_user_id(username):
 
 def save_game_for_user(player_id, metrics, buildings, popups):
     conn = get_connection()
+    if conn is None:
+        _fallback_user_metrics[player_id] = metrics
+        _fallback_user_buildings[player_id] = buildings
+        _fallback_user_popups[player_id] = popups
+        return
+
     cur = conn.cursor()
 
     # Metrics
@@ -281,6 +360,12 @@ def save_game_for_user(player_id, metrics, buildings, popups):
 
 def load_game_for_user(player_id):
     conn = get_connection()
+    if conn is None:
+        metrics = _fallback_user_metrics.get(player_id, {"score": 0, "time_of_year": "Spring"})
+        buildings = _fallback_user_buildings.get(player_id, {})
+        popups = _fallback_user_popups.get(player_id, [])
+        return metrics, buildings, popups
+
     cur = conn.cursor()
 
     # metrics
@@ -309,6 +394,11 @@ import json
 
 def save_full_state(player_id, state_dict):
     conn = get_connection()
+    if conn is None:
+        _fallback_user_state[player_id] = state_dict
+        print("FULL STATE SAVED (fallback) for", player_id)
+        return
+
     cur = conn.cursor()
 
     cur.execute("""
@@ -326,6 +416,13 @@ def save_full_state(player_id, state_dict):
 
 def load_full_state(player_id):
     conn = get_connection()
+    if conn is None:
+        if player_id not in _fallback_user_state:
+            print("No saved state for user", player_id)
+            return None
+        print("FULL STATE LOADED (fallback) for", player_id)
+        return _fallback_user_state[player_id]
+
     cur = conn.cursor()
 
     cur.execute("""

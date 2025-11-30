@@ -3,7 +3,8 @@ from scripts.MetricsClass import Metrics
 # applies metric changes
 class AdjustMetricsTask:
 
-    def __init__(self, budget=450000000, prestige=51, sHappiness=75, aHappiness=60, security=50, academics=80):
+    def __init__(self, budget=0, prestige=0, sHappiness=0, aHappiness=0, security=0, academics=0):
+        # Defaults to zero so only provided metrics change
         self.budget = budget
         self.prestige = prestige
         self.sHappiness = sHappiness
