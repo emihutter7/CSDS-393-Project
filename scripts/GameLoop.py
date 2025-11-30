@@ -333,7 +333,8 @@ class StartGame():
         # metrics and popups
         self.budget = 100000
         self.tasks = [] # was thinking a list of buttons that will cause popup to open
-        self.semester = 1
+        self.semester = (self.game_state.turn + 1) // 2
+        self.turn = self.game_state.turn
         self.turn = self.game_state.max_turns
         self.help_button = Button(dimensions=(WINDOW_WIDTH - 125, 20, 120, 40), # dimensions should be x,y,width,height
                                   text="Help",
@@ -1189,7 +1190,7 @@ class LoadGame():
 
         # Switch to the game
         self.gameStateManager.set_current_state("Start Game")
-
+        
 
     def run(self):
         self.screen.fill(BLACK)
@@ -1264,7 +1265,7 @@ class InGameMenu():
         from .db import save_full_state
         save_full_state(player_id, state)
         print("Game saved to database for player", player_id)
-
+       
 
     #NEWLY ADDED BY RAAGHUV FOR TESTING RECURSION PROBLEM        
     def get_save_path(self):

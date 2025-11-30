@@ -5,8 +5,8 @@ from .db import (
 )
 
 class GameState:
-    def __init__(self, turn=1, score=0, buildings=None, popups=None):
-        self.time_of_year = "Fall"
+    def __init__(self, turn=1, score=0, time_of_year="Fall",buildings=None, popups=None):
+        self.time_of_year = time_of_year
         self.turn = turn
         self.score = score
         self.buildings = buildings or {}
