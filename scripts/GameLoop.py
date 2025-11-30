@@ -351,9 +351,9 @@ class StartGame():
         # if we put all images in the images folder, the relative directory will be easier to follow
         # dimensions should be x,y,width,height
         raw_buildings = [
-            ("NRV Dorms", (370, 120, 80, 80), "../images/testing2.png"),
-            ("Leutner",   (400, 70, 50, 50),  None),
-            ("Wyant",     (500, 20, 50, 50),  None),
+            ("NRV Dorms", (370, 120, 80, 80), None),
+            ("Leut.",   (400, 70, 50, 50),  None),
+            ("Wyan.",     (500, 20, 50, 50),  None),
 
             ("PBL",       (230, 210, 70, 70), None),
             ("Tink UC",   (300, 280, 50, 100), None),
@@ -362,10 +362,10 @@ class StartGame():
             ("SRV Dorms", (900, 600, 70, 70), None),
 
             ("Allen Ford", (450, 460, 50, 50), None),
-            ("Fribley",    (890, 675, 50, 50), None),
+            ("Frib.",    (890, 675, 50, 50), None),
 
             ("Veale",      (810, 750, 70, 70), None),
-            ("Glennan",    (730, 770, 50, 50), None),
+            ("Glen.",    (730, 770, 50, 50), None),
             ("White",      (675, 770, 50, 50), None),
             ("Olin",       (620, 770, 50, 50), None),
 
@@ -374,17 +374,17 @@ class StartGame():
 
             ("Wick",       (425, 770, 50, 50), None),
             ("ISEB",       (370, 770, 50, 50), None),
-            ("Tomlinson",  (315, 770, 50, 50), None),
+            ("Toml.",  (315, 770, 50, 50), None),
 
-            ("Crawford",   (290, 655, 50, 50), None),
-            ("Adelbert",   (340, 540, 50, 50), None),
+            ("Craw.",   (290, 655, 50, 50), None),
+            ("Adel.",   (340, 540, 50, 50), None),
 
-            ("Rockefeller", (445, 585, 50, 50), None),
-            ("Strosacker",  (500, 585, 50, 50), None),
+            ("Rock.", (445, 585, 50, 50), None),
+            ("Stros.",  (500, 585, 50, 50), None),
             ("AW Smith",    (555, 585, 50, 50), None),
 
-            ("Bingham",     (630, 660, 50, 50), None),
-            ("Schmitt",     (510, 505, 50, 50), None),
+            ("Bing.",     (630, 660, 50, 50), None),
+            ("Schm.",     (510, 505, 50, 50), None),
         ]
 
         self.building_data = []
@@ -404,7 +404,7 @@ class StartGame():
             # Fix the callback so it knows which button it belongs to
             button.callback = lambda b=button: self.show_building_menu(b)
 
-        # Speeds
+                # Speeds
         student_speeds = [1.4, 1.7, 2.0, 2.3, 2.6, 3.0]
         admin_speeds   = [0.7, 0.9, 1.1, 1.3, 1.5]
 
