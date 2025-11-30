@@ -350,43 +350,59 @@ class StartGame():
         # for the menu manager - the last param is if you want it to be an image that you upload for the button
         # if we put all images in the images folder, the relative directory will be easier to follow
         # dimensions should be x,y,width,height
-        self.building_data = [
-            ("NRV Dorms", lambda : self.show_building_menu("NRV Dorms"), (370, 120, 80, 80), "../images/testing2.png"),
-            ("Leut.", lambda : self.show_building_menu("Leutner"), (400, 70, 50, 50)),
-            ("Wyant", lambda : self.show_building_menu("Wyant"), (500, 20, 50, 50)),
+        raw_buildings = [
+            ("NRV Dorms", (370, 120, 80, 80), "../images/testing2.png"),
+            ("Leutner",   (400, 70, 50, 50),  None),
+            ("Wyant",     (500, 20, 50, 50),  None),
 
-            ("PBL", lambda : self.show_building_menu("PBL"), (230, 210, 70, 70)),
-            ("Tink UC", lambda : self.show_building_menu("Tink UC"), (300, 280, 50, 100)),
-            ("Thwing", lambda : self.show_building_menu("Thwing"), (360, 330, 60, 40)),
-            ("KSL", lambda : self.show_building_menu("KSL"), (245, 390, 70, 70)),
-            ("SRV Dorms", lambda : self.show_building_menu("SRV Dorms"), (900, 600, 70, 70)),
+            ("PBL",       (230, 210, 70, 70), None),
+            ("Tink UC",   (300, 280, 50, 100), None),
+            ("Thwing",    (360, 330, 60, 40), None),
+            ("KSL",       (245, 390, 70, 70), None),
+            ("SRV Dorms", (900, 600, 70, 70), None),
 
-            ("Allen Ford", lambda : self.show_building_menu("Allen Ford"), (450, 460, 50, 50)),
-            ("Frib.", lambda : self.show_building_menu("Fribley"), (890, 675, 50, 50)),
-     
-            ("Veale", lambda : self.show_building_menu("Veale"), (810, 750, 70, 70)),
-            ("Glen.", lambda : self.show_building_menu("Glennan"), (730, 770, 50, 50)),
-            ("White", lambda : self.show_building_menu("White"), (675, 770, 50, 50)),
-            ("Olin", lambda : self.show_building_menu("Olin"), (620, 770, 50, 50)),
+            ("Allen Ford", (450, 460, 50, 50), None),
+            ("Fribley",    (890, 675, 50, 50), None),
 
-            ("Nord", lambda : self.show_building_menu("Nord"), (550, 770, 50, 50)),
-            ("Sears", lambda : self.show_building_menu("Sears"), (495, 770, 50, 50)),
+            ("Veale",      (810, 750, 70, 70), None),
+            ("Glennan",    (730, 770, 50, 50), None),
+            ("White",      (675, 770, 50, 50), None),
+            ("Olin",       (620, 770, 50, 50), None),
 
-            ("Wick.", lambda : self.show_building_menu("Wick."), (425, 770, 50, 50)),
-            ("ISEB", lambda : self.show_building_menu("ISEB"), (370, 770, 50, 50)),
-            ("Toml.", lambda : self.show_building_menu("Tomlinson"), (315, 770, 50, 50)),
+            ("Nord",       (550, 770, 50, 50), None),
+            ("Sears",      (495, 770, 50, 50), None),
 
-            ("Craw.", lambda : self.show_building_menu("Crawford"), (290, 655, 50, 50)),
-            ("Adel.", lambda : self.show_building_menu("Adelbert"), (340, 540, 50, 50)),
+            ("Wick",       (425, 770, 50, 50), None),
+            ("ISEB",       (370, 770, 50, 50), None),
+            ("Tomlinson",  (315, 770, 50, 50), None),
 
-            ("Rock.", lambda : self.show_building_menu("Rockefeller"), (445, 585, 50, 50)),
-            ("Stros.", lambda : self.show_building_menu("Strosacker"), (500, 585, 50, 50)),
-            ("AW Smith", lambda : self.show_building_menu("AW Smith"), (555, 585, 50, 50)),
+            ("Crawford",   (290, 655, 50, 50), None),
+            ("Adelbert",   (340, 540, 50, 50), None),
 
-            ("Bing.", lambda : self.show_building_menu("Bingham"), (630, 660, 50, 50)),
-            ("Schm.", lambda : self.show_building_menu("Schmitt"), (510, 505, 50, 50)),
+            ("Rockefeller", (445, 585, 50, 50), None),
+            ("Strosacker",  (500, 585, 50, 50), None),
+            ("AW Smith",    (555, 585, 50, 50), None),
+
+            ("Bingham",     (630, 660, 50, 50), None),
+            ("Schmitt",     (510, 505, 50, 50), None),
         ]
+
+        self.building_data = []
+        for name, dims, img in raw_buildings:
+            self.building_data.append([name, None, dims, img])
+        
         self.menu_manager.main_setup(self.building_data)
+
+        for entry, button in zip(self.building_data, self.menu_manager.main_buttons):
+
+            # Store original name so text can be updated like "Veale 2"
+            button.original_name = entry[0]
+
+            # Set initial level
+            button.level = 1
+
+            # Fix the callback so it knows which button it belongs to
+            button.callback = lambda b=button: self.show_building_menu(b)
 
         # Speeds
         student_speeds = [2, 1, 2.2]
@@ -547,26 +563,35 @@ class StartGame():
     
 
     # generic building menu
-    def show_building_menu(self, building_name):
+    def show_building_menu(self, building_button):
+        b = building_button          # the actual button object
+        name = b.original_name       # original base name (like "Veale")
+        lvl = b.level                # current building level
+
+        # upgrade logic
         def upgrade():
-            # placeholder (have upgrade menu from the building_name dictionary or something
-            # upgrade_building func should take in building name as param and update dictionary
+            if b.level < 3:
+                b.level += 1
+                b.text = f"{b.original_name} {b.level}"
+            # re-open menu so title updates
+            self.menu_manager.close_menu()
+            self.show_building_menu(b)
+
+        # close logic
+        def close_menu():
             self.menu_manager.close_menu()
 
-        def close_menu():
-            print("Action: Start cancelled by user.")
-
-        # Building menu
         menu = Menu(
             menu_manager=self.menu_manager,
-            title= building_name + " Menu",
-            text=f"Do you want to upgrade?",
+            title=f"{name} Menu — Level {lvl}",
+            text=f"{name} is currently Level {lvl}",
             user_options=[
                 ("UPGRADE", upgrade),
                 ("CLOSE", close_menu)
             ],
             user_closable=True
         )
+
         self.menu_manager.open_menu(menu)
     
     # checking user input

@@ -13,6 +13,7 @@ class Button:
                  text_color=BLACK, 
                  base_color=PRIMARY_COLOR, 
                  hover_color=ACCENT_COLOR,
+                 is_building=False,
                  image_path=None,
                  fontsize=24,
                  scale_to_fit=True):
@@ -27,6 +28,8 @@ class Button:
         self.text_color = text_color
         self.border_color = self.text_color
         self.is_hovered = False
+        self.is_building = is_building
+        self.level = 1
 
         self.image = None
         if image_path:
@@ -117,3 +120,11 @@ class Button:
             lines.append(current_line)
 
         return lines
+    
+    # handles upgrade building event
+    def upgrade(self):
+        if self.level < 3:
+            self.level += 1
+            return
+        else:
+            return    
