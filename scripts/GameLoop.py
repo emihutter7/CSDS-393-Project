@@ -405,8 +405,8 @@ class StartGame():
             button.callback = lambda b=button: self.show_building_menu(b)
 
         # Speeds
-        student_speeds = [2, 1, 2.2]
-        admin_speeds   = [.8, 1.5, 1.2]
+        student_speeds = [1.4, 1.7, 2.0, 2.3, 2.6, 3.0]
+        admin_speeds   = [0.7, 0.9, 1.1, 1.3, 1.5]
 
         # Road A (Lower Quad)
         roadA_left  = (336, 735)
@@ -418,22 +418,73 @@ class StartGame():
 
         # STUDENTS
         self.students = [
-            # Road A student
-            Student(roadA_left[0], roadA_left[1], (0,255,0), student_speeds[0], roadA_right),
+            # 1. KSL → Glennan (horizontal)
+            Student(315, 425, (0,255,0), student_speeds[0], (765, 425)),
+            Student(315, 425, (0,255,0), student_speeds[2], (765, 425)),
 
-            # Road B students
-            Student(roadB_left[0], roadB_left[1], (0,255,0), student_speeds[1], roadB_right),
-            Student(roadB_left[0], roadB_left[1], (0,255,0), student_speeds[2], roadB_right),
+            # 2. Glennan → Tomlinson (horizontal)
+            Student(336, 735, (0,255,0), student_speeds[3], (756, 735)),
+            Student(336, 735, (0,255,0), student_speeds[1], (756, 735)),
+
+            # 3. ISEB → Thwing (vertical)
+            Student(405, 370, (0,255,0), student_speeds[5], (405, 735)),
+            Student(405, 370, (0,255,0), student_speeds[1], (405, 735)),
+
+            # 4. Wyant → KSL (vertical)
+            Student(540, 70,  (0,255,0), student_speeds[2], (540, 425)),
+            Student(540, 70,  (0,255,0), student_speeds[4], (540, 425)),
+
+            # 5. KSL → Veale (vertical)
+            Student(760, 425, (0,255,0), student_speeds[0], (760, 770)),
+            Student(760, 425, (0,255,0), student_speeds[3], (760, 770)),
+
+            # 6. Bingham → Crawford (horizontal)
+            Student(405, 660, (0,255,0), student_speeds[4], (600, 660)),
+
+            # 7. Leutner (horizontal)
+            Student(400, 95,  (0,255,0), student_speeds[1], (540, 95)),
+
+            # 8. SRV Dorms road (horizontal)
+            Student(760, 635, (0,255,0), student_speeds[2], (900, 635)),
+
+            # 9. Schmitt road (horizontal)
+            Student(405, 530, (0,255,0), student_speeds[5], (535, 530)),
+
+            # 10. Fribley road (horizontal)
+            Student(760, 700, (0,255,0), student_speeds[1], (890, 700)),
         ]
 
         # ADMINS
         self.admins = [
-            # Road A admins
-            Admin(roadA_left[0], roadA_left[1], (0,0,0), admin_speeds[0], roadA_right),
-            Admin(roadA_left[0], roadA_left[1], (0,0,0), admin_speeds[1], roadA_right),
+            # 1. KSL → Glennan
+            Admin(315, 425, (0,0,0), admin_speeds[1], (765, 425)),
 
-            # Road B admin
-            Admin(roadB_left[0], roadB_left[1], (0,0,0), admin_speeds[2], roadB_right),
+            # 2. Glennan → Tomlinson
+            Admin(336, 735, (0,0,0), admin_speeds[0], (756, 735)),
+
+            # 3. ISEB → Thwing
+            Admin(405, 370, (0,0,0), admin_speeds[3], (405, 735)),
+
+            # 4. Wyant → KSL
+            Admin(540, 70,  (0,0,0), admin_speeds[2], (540, 425)),
+
+            # 5. KSL → Veale
+            Admin(760, 425, (0,0,0), admin_speeds[4], (760, 770)),
+
+            # 6. Bingham → Crawford
+            Admin(405, 660, (0,0,0), admin_speeds[1], (600, 660)),
+
+            # 7. Leutner
+            Admin(400, 95,  (0,0,0), admin_speeds[3], (540, 95)),
+
+            # 8. SRV Dorms
+            Admin(760, 635, (0,0,0), admin_speeds[0], (900, 635)),
+
+            # 9. Schmitt
+            Admin(405, 530, (0,0,0), admin_speeds[2], (535, 530)),
+
+            # 10. Fribley
+            Admin(760, 700, (0,0,0), admin_speeds[4], (890, 700)),
         ]
         self.player = Player(200, 300)
         self.player_velocity = [0, 0]
