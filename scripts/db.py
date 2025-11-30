@@ -129,15 +129,16 @@ def db_init():
 
 # Global save methods
 
-def save_metrics(score, time_of_year):
+def save_metrics(score, time_of_year, turn):
     conn = get_connection()
     if conn is None:
         _fallback_metrics["score"] = score
         _fallback_metrics["time_of_year"] = time_of_year
+        _fallback_metrics["turn"] = turn 
         return
 
     cur = conn.cursor()
-    cur.execute("DELETE FROM metrics")  # keep only one record
+    cur.execute("DELETE FROM metrics")  
     cur.execute("INSERT INTO metrics (score, time_of_year) VALUES (%s, %s)",
                 (score, time_of_year))
     conn.commit()
@@ -146,15 +147,25 @@ def save_metrics(score, time_of_year):
 
 def load_metrics():
     conn = get_connection()
+    
     if conn is None:
-        return _fallback_metrics["score"], _fallback_metrics["time_of_year"]
-
+        return (
+            _fallback_metrics.get("score", 0),
+            _fallback_metrics.get("time_of_year", "Spring"),
+            _fallback_metrics.get("turn", 1)
+        )
+    
     cur = conn.cursor()
     cur.execute("SELECT score, time_of_year FROM metrics LIMIT 1")
     row = cur.fetchone()
     cur.close()
     conn.close()
-    return row if row else (0, "Spring")
+    
+    if row:
+        score, time_of_year, turn = row
+        return score, time_of_year, turn
+
+    return 0, "Spring", 1
 
 # Buildings methods
 

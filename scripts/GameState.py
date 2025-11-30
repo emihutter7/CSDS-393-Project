@@ -5,22 +5,22 @@ from .db import (
 )
 
 class GameState:
-    def __init__(self):
-        self.score = 0
+    def __init__(self, turn=1, score=0, buildings=None, popups=None):
         self.time_of_year = "Fall"
-        self.buildings = {}
-        self.popups = []
-        self.turn = 1                 
+        self.turn = turn
+        self.score = score
+        self.buildings = buildings or {}
+        self.popups = popups or []         
         self.max_turns = 16
 
     def load(self):
-        self.score, self.time_of_year = load_metrics()
+        self.score, self.time_of_year, self.turn = load_metrics()
         self.buildings = load_buildings()
         self.popups = load_popups()
         print("Game state loaded from database.")
 
     def save(self):
-        save_metrics(self.score, self.time_of_year)
+        save_metrics(self.score, self.time_of_year, self.turn)
         save_buildings(self.buildings)
         save_popups(self.popups)
         print("Game state saved to database.")
