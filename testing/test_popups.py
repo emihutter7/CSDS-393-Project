@@ -8,7 +8,7 @@ def m():
 
 # test AdjustMetricsTask
 def test_adjust_metrics_task_adds_correctly(m):
-    task = AdjustMetricsTask(budget=-2_000_000, sHappiness=+5, security=+3)
+    task = AdjustMetricsTask(budget=-2_000_000, sHappiness=+3, security=+2)
     starting_budget = m.budget
     starting_shappy = m.sHappiness
     starting_security = m.security
@@ -16,8 +16,8 @@ def test_adjust_metrics_task_adds_correctly(m):
     task.run(m)
 
     assert m.budget == starting_budget - 2_000_000
-    assert m.sHappiness == starting_shappy + 5
-    assert m.security == starting_security + 3
+    assert m.sHappiness == starting_shappy + 3
+    assert m.security == starting_security + 2
 
 
 # PopupEvent and PopupChoice init test
@@ -34,7 +34,7 @@ def test_popupchoice_and_event_creation():
 
 # test trigger_choice actually applies changes
 def test_trigger_choice_applies_effects(m):
-    choice1 = PopupChoice("Test choice", {"budget": -1_000_000, "sHappiness": +3})
+    choice1 = PopupChoice("Test choice", {"budget": -1_000_000, "sHappiness": +2})
     event = PopupEvent("Test Event", "Demo event", "minor", [choice1])
 
     start_budget = m.budget
@@ -43,7 +43,7 @@ def test_trigger_choice_applies_effects(m):
     event.trigger_choice(0, m)
 
     assert m.budget == start_budget - 1000000
-    assert m.sHappiness == start_shappy + 3
+    assert m.sHappiness == start_shappy + 2
 
 
 # test snowstorm choice one
@@ -55,10 +55,10 @@ def test_snowstorm_choice_one(m):
     start_security = m.security
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 2_000_000
-    assert m.sHappiness == start_shappy + 10
-    assert m.aHappiness == start_ahappy + 10
-    assert m.security == start_security + 5
+    assert m.budget == start_budget - 20_000_000
+    assert m.sHappiness == start_shappy + 4
+    assert m.aHappiness == start_ahappy + 4
+    assert m.security == start_security + 2
 
 # test snowstorm choice three
 def test_snowstorm_choice_three(m):
@@ -68,9 +68,9 @@ def test_snowstorm_choice_three(m):
     start_security = m.security
 
     event.trigger_choice(2, m)
-    assert m.budget == start_budget + 1_000_000
-    assert m.sHappiness == start_shappy - 6
-    assert m.security == start_security - 5
+    assert m.budget == start_budget + 10_000_000
+    assert m.sHappiness == start_shappy - 3
+    assert m.security == start_security - 2
 
 # test dining choice one
 def test_dining_choice_one(m):
@@ -80,9 +80,9 @@ def test_dining_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 3_000_000
-    assert m.sHappiness == start_shappy + 10
-    assert m.prestige == start_prestige + 5
+    assert m.budget == start_budget - 30_000_000
+    assert m.sHappiness == start_shappy + 4
+    assert m.prestige == start_prestige + 2
 
 # test dining choice three
 def test_dining_choice_three(m):
@@ -91,8 +91,8 @@ def test_dining_choice_three(m):
     start_prestige = m.prestige
 
     event.trigger_choice(2, m)
-    assert m.sHappiness == start_shappy - 10
-    assert m.prestige == start_prestige - 5
+    assert m.sHappiness == start_shappy - 4
+    assert m.prestige == start_prestige - 2
 
 # test faculty choice one
 def test_faculty_choice_one(m):
@@ -103,10 +103,10 @@ def test_faculty_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 4_000_000
-    assert m.academics == start_academics + 10
-    assert m.aHappiness == start_ahappy + 10
-    assert m.prestige == start_prestige + 10
+    assert m.budget == start_budget - 40_000_000
+    assert m.academics == start_academics + 4
+    assert m.aHappiness == start_ahappy + 4
+    assert m.prestige == start_prestige + 4
 
 # test faculty choice three
 def test_faculty_choice_three(m):
@@ -116,9 +116,9 @@ def test_faculty_choice_three(m):
     start_prestige = m.prestige
 
     event.trigger_choice(2, m)
-    assert m.aHappiness == start_ahappy - 10
-    assert m.academics == start_academics - 10
-    assert m.prestige == start_prestige - 10
+    assert m.aHappiness == start_ahappy - 4
+    assert m.academics == start_academics - 4
+    assert m.prestige == start_prestige - 4
 
 # test dorm choice one
 def test_dorm_choice_one(m):
@@ -127,8 +127,8 @@ def test_dorm_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 2_000_000
-    assert m.sHappiness == start_shappy + 10
+    assert m.budget == start_budget - 20_000_000
+    assert m.sHappiness == start_shappy + 4
 
 # test dorm choice three
 def test_dorm_choice_three(m):
@@ -137,8 +137,8 @@ def test_dorm_choice_three(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(2, m)
-    assert m.budget == start_budget + 2_000_000
-    assert m.sHappiness == start_shappy - 10
+    assert m.budget == start_budget + 20_000_000
+    assert m.sHappiness == start_shappy - 4
 
 # test board choice one
 def test_board_choice_one(m):
@@ -150,11 +150,11 @@ def test_board_choice_one(m):
     start_ahappy = m.aHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.prestige == start_prestige + 10
-    assert m.academics == start_academics + 10
-    assert m.sHappiness == start_shappy + 10
-    assert m.aHappiness == start_ahappy + 5
+    assert m.budget == start_budget - 10_000_000
+    assert m.prestige == start_prestige + 4
+    assert m.academics == start_academics + 4
+    assert m.sHappiness == start_shappy + 4
+    assert m.aHappiness == start_ahappy + 2
 
 # test board choice two
 def test_board_choice_two(m):
@@ -164,9 +164,9 @@ def test_board_choice_two(m):
     start_ahappy = m.aHappiness
 
     event.trigger_choice(1, m)
-    assert m.budget == start_budget + 5_000_000
-    assert m.sHappiness == start_shappy - 5
-    assert m.aHappiness == start_ahappy - 5
+    assert m.budget == start_budget + 50_000_000
+    assert m.sHappiness == start_shappy - 3
+    assert m.aHappiness == start_ahappy - 3
 
 # test safety choice one
 def test_safety_choice_one(m):
@@ -177,10 +177,10 @@ def test_safety_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 4_000_000
-    assert m.security == start_security + 10
-    assert m.prestige == start_prestige + 5
-    assert m.sHappiness == start_shappy + 5
+    assert m.budget == start_budget - 40_000_000
+    assert m.security == start_security + 4
+    assert m.prestige == start_prestige + 2
+    assert m.sHappiness == start_shappy + 2
 
 # test safety choice two
 def test_safety_choice_three(m):
@@ -190,9 +190,9 @@ def test_safety_choice_three(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(2, m)
-    assert m.security == start_security - 5
-    assert m.prestige == start_prestige - 5
-    assert m.sHappiness == start_shappy - 5
+    assert m.security == start_security - 3
+    assert m.prestige == start_prestige - 3
+    assert m.sHappiness == start_shappy - 2
 
 # test dining hall choice one
 def test_dining_hall_choice_one(m):
@@ -202,9 +202,9 @@ def test_dining_hall_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 3_000_000
-    assert m.sHappiness == start_shappy + 10
-    assert m.prestige == start_prestige + 5
+    assert m.budget == start_budget - 30_000_000
+    assert m.sHappiness == start_shappy + 4
+    assert m.prestige == start_prestige + 2
 
 # test faculty research choice one
 def test_faculty_research_choice_one(m):
@@ -215,10 +215,10 @@ def test_faculty_research_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 4_000_000
-    assert m.academics == start_academics + 10
-    assert m.aHappiness == start_ahappy + 10
-    assert m.prestige == start_prestige + 10
+    assert m.budget == start_budget - 40_000_000
+    assert m.academics == start_academics + 4
+    assert m.aHappiness == start_ahappy + 4
+    assert m.prestige == start_prestige + 4
 
 # test dorm overcrowding choice one
 def test_dorm_overcrowding_choice_one(m):
@@ -250,9 +250,9 @@ def test_festival_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_500_000
-    assert m.sHappiness == start_shappy + 15
-    assert m.prestige == start_prestige + 5
+    assert m.budget == start_budget - 15_000_000
+    assert m.sHappiness == start_shappy + 5
+    assert m.prestige == start_prestige + 2
 
 # test network glitch choice one
 def test_network_glitch_choice_one(m):
@@ -262,9 +262,9 @@ def test_network_glitch_choice_one(m):
     start_ahappy = m.aHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 2_000_000
-    assert m.academics == start_academics + 10
-    assert m.aHappiness == start_ahappy + 5
+    assert m.budget == start_budget - 20_000_000
+    assert m.academics == start_academics + 4
+    assert m.aHappiness == start_ahappy + 2
 
 # test parking shortage choice one
 def test_parking_shortage_choice_one(m):
@@ -274,9 +274,9 @@ def test_parking_shortage_choice_one(m):
     start_ahappy = m.aHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 3_000_000
-    assert m.sHappiness == start_shappy + 10
-    assert m.aHappiness == start_ahappy + 10
+    assert m.budget == start_budget - 30_000_000
+    assert m.sHappiness == start_shappy + 4
+    assert m.aHappiness == start_ahappy + 4
 
 # test library hours choice one
 def test_library_hours_choice_one(m):
@@ -286,9 +286,9 @@ def test_library_hours_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.academics == start_academics + 10
-    assert m.sHappiness == start_shappy + 5
+    assert m.budget == start_budget - 10_000_000
+    assert m.academics == start_academics + 4
+    assert m.sHappiness == start_shappy + 2
 
 # test broken gym choice one
 def test_broken_gym_choice_one(m):
@@ -297,8 +297,8 @@ def test_broken_gym_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_500_000
-    assert m.sHappiness == start_shappy + 10
+    assert m.budget == start_budget - 15_000_000
+    assert m.sHappiness == start_shappy + 4
 
 # test cafeteria complaints choice one
 def test_cafeteria_complaints_choice_one(m):
@@ -307,8 +307,8 @@ def test_cafeteria_complaints_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.sHappiness == start_shappy + 15
+    assert m.budget == start_budget - 10_000_000
+    assert m.sHappiness == start_shappy + 5
 
 # test drone usage choice one
 def test_drone_usage_choice_one(m):
@@ -317,8 +317,8 @@ def test_drone_usage_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.security == start_security + 10
-    assert m.sHappiness == start_shappy - 5
+    assert m.security == start_security + 4
+    assert m.sHappiness == start_shappy - 2
 
 # test data breach choice one
 def test_data_breach_choice_one(m):
@@ -328,9 +328,9 @@ def test_data_breach_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_500_000
-    assert m.security == start_security + 10
-    assert m.prestige == start_prestige + 5
+    assert m.budget == start_budget - 15_000_000
+    assert m.security == start_security + 4
+    assert m.prestige == start_prestige + 2
 
 # test student protest choice one
 def test_student_protest_choice_one(m):
@@ -340,9 +340,9 @@ def test_student_protest_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.sHappiness == start_shappy + 10
-    assert m.prestige == start_prestige + 5
+    assert m.budget == start_budget - 10_000_000
+    assert m.sHappiness == start_shappy + 4
+    assert m.prestige == start_prestige + 2
 
 # test mural project choice one
 def test_mural_project_choice_one(m):
@@ -352,9 +352,9 @@ def test_mural_project_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.prestige == start_prestige + 10
-    assert m.sHappiness == start_shappy + 5
+    assert m.budget == start_budget - 10_000_000
+    assert m.prestige == start_prestige + 4
+    assert m.sHappiness == start_shappy + 2
 
 # test hvac malfunction choice one
 def test_hvac_malfunction_choice_one(m):
@@ -364,9 +364,9 @@ def test_hvac_malfunction_choice_one(m):
     start_academics = m.academics
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 3_000_000
-    assert m.aHappiness == start_ahappy + 10
-    assert m.academics == start_academics + 5
+    assert m.budget == start_budget - 30_000_000
+    assert m.aHappiness == start_ahappy + 4
+    assert m.academics == start_academics + 2
 
 # test visiting scholar choice one
 def test_visiting_scholar_choice_one(m):
@@ -412,9 +412,9 @@ def test_fire_drill_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.security == start_security + 10
-    assert m.prestige == start_prestige + 5
+    assert m.budget == start_budget - 10_000_000
+    assert m.security == start_security + 4
+    assert m.prestige == start_prestige + 2
 
 # test cultural exchange choice one
 def test_cultural_exchange_choice_one(m):
@@ -424,9 +424,9 @@ def test_cultural_exchange_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_500_000
-    assert m.sHappiness == start_shappy + 10
-    assert m.prestige == start_prestige + 5
+    assert m.budget == start_budget - 15_000_000
+    assert m.sHappiness == start_shappy + 4
+    assert m.prestige == start_prestige + 2
 
 # test lost endowment choice one
 def test_lost_endowment_choice_one(m):
@@ -435,8 +435,8 @@ def test_lost_endowment_choice_one(m):
     start_security = m.security
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.security == start_security + 10
+    assert m.budget == start_budget - 10_000_000
+    assert m.security == start_security + 4
 
 # test new cafeteria choice one
 def test_new_cafeteria_choice_one(m):
@@ -445,8 +445,8 @@ def test_new_cafeteria_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget + 3_000_000
-    assert m.sHappiness == start_shappy + 10
+    assert m.budget == start_budget + 30_000_000
+    assert m.sHappiness == start_shappy + 4
 
 # test art exhibit choice one
 def test_art_exhibit_choice_one(m):
@@ -455,8 +455,8 @@ def test_art_exhibit_choice_one(m):
     start_budget = m.budget
 
     event.trigger_choice(0, m)
-    assert m.prestige == start_prestige + 10
-    assert m.budget == start_budget + 2_000_000
+    assert m.prestige == start_prestige + 4
+    assert m.budget == start_budget + 20_000_000
 
 # test dorm fire alarm choice one
 def test_dorm_fire_alarm_choice_one(m):
@@ -466,9 +466,9 @@ def test_dorm_fire_alarm_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.security == start_security + 10
-    assert m.sHappiness == start_shappy + 5
+    assert m.budget == start_budget - 10_000_000
+    assert m.security == start_security + 4
+    assert m.sHappiness == start_shappy + 2
 
 # test board meeting choice one
 def test_board_meeting_choice_one(m):
@@ -480,11 +480,11 @@ def test_board_meeting_choice_one(m):
     start_ahappy = m.aHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 1_000_000
-    assert m.prestige == start_prestige + 10
-    assert m.academics == start_academics + 10
-    assert m.sHappiness == start_shappy + 10
-    assert m.aHappiness == start_ahappy + 5
+    assert m.budget == start_budget - 10_000_000
+    assert m.prestige == start_prestige + 4
+    assert m.academics == start_academics + 4
+    assert m.sHappiness == start_shappy + 4
+    assert m.aHappiness == start_ahappy + 2
 
 # test campus safety review choice one
 def test_campus_safety_review_choice_one(m):
@@ -495,10 +495,10 @@ def test_campus_safety_review_choice_one(m):
     start_shappy = m.sHappiness
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 4_000_000
-    assert m.security == start_security + 10
-    assert m.prestige == start_prestige + 5
-    assert m.sHappiness == start_shappy + 5
+    assert m.budget == start_budget - 40_000_000
+    assert m.security == start_security + 4
+    assert m.prestige == start_prestige + 2
+    assert m.sHappiness == start_shappy + 2
 
 # test donor gala choice one
 def test_donor_gala_choice_one(m):
@@ -507,8 +507,8 @@ def test_donor_gala_choice_one(m):
     start_prestige = m.prestige
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 6_000_000  # -6M +8M net
-    assert m.prestige == start_prestige + 15
+    assert m.budget == start_budget - 60_000_000  # scaled
+    assert m.prestige == start_prestige + 5
 
 # test expansion plan choice one
 def test_expansion_plan_choice_one(m):
@@ -518,9 +518,9 @@ def test_expansion_plan_choice_one(m):
     start_academics = m.academics
 
     event.trigger_choice(0, m)
-    assert m.budget == start_budget - 15_000_000
-    assert m.prestige == start_prestige + 15
-    assert m.academics == start_academics + 15
+    assert m.budget == start_budget - 150_000_000
+    assert m.prestige == start_prestige + 5
+    assert m.academics == start_academics + 5
 
 # test sports scandal choice one
 def test_sports_scandal_choice_one(m):
