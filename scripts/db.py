@@ -1,6 +1,7 @@
 import psycopg2
 from .config import DATABASE_CONFIGURATION
 import bcrypt
+import json
 
 # Fallback in-memory storage if Postgres is unavailable.
 DB_AVAILABLE = True
@@ -94,8 +95,10 @@ def db_init():
     )
     """)
 
-    # Per-User game save tables
-
+    # -------------------------
+    # Per-user game save tables
+    # -------------------------
+    # Metrics
     curs.execute("""
     CREATE TABLE IF NOT EXISTS user_metrics (
         player_id INTEGER PRIMARY KEY REFERENCES users(player_id),
@@ -104,6 +107,7 @@ def db_init():
     )
     """)
 
+    # User 
     curs.execute("""
     CREATE TABLE IF NOT EXISTS user_buildings (
         player_id INTEGER REFERENCES users(player_id),
@@ -113,6 +117,7 @@ def db_init():
     )
     """)
 
+    # Popups
     curs.execute("""
     CREATE TABLE IF NOT EXISTS user_popups (
         player_id INTEGER REFERENCES users(player_id),
@@ -127,8 +132,9 @@ def db_init():
     curs.close()
     connection.close()
 
+# -------------------
 # Global save methods
-
+# -------------------
 def save_metrics(score, time_of_year, turn):
     conn = get_connection()
     if conn is None:
@@ -144,6 +150,7 @@ def save_metrics(score, time_of_year, turn):
     conn.commit()
     cur.close()
     conn.close()
+
 
 def load_metrics():
     conn = get_connection()
@@ -167,8 +174,10 @@ def load_metrics():
 
     return 0, "Spring", 1
 
-# Buildings methods
 
+# -------------------------
+# Save and loading buildings
+# -------------------------
 def save_buildings(buildings):
     conn = get_connection()
     if conn is None:
@@ -198,8 +207,9 @@ def load_buildings():
     conn.close()
     return {name: level for name, level in rows}
 
-# Popups methods
-
+# -------------------------
+# Save and loading popups
+# -------------------------
 def save_popups(popups):
     conn = get_connection()
     if conn is None:
@@ -234,8 +244,10 @@ def load_popups():
         for name, is_active, completed in rows
     ]
 
-# User authentication methods
 
+# -------------------------
+# User authentication functions
+# -------------------------
 def create_user(username, password):
     global _fallback_user_seq
     hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
@@ -276,8 +288,9 @@ def authenticate_user(username, password):
         return True
     return False
 
-# High score methods
-
+# -------------------------
+# High score functions
+# -------------------------
 def save_score(player_id, score):
     conn = get_connection()
     if conn is None:
@@ -324,8 +337,10 @@ def get_user_id(username):
     conn.close()
     return row[0] if row else None
 
-# Per-user save and load methods
 
+# -------------------------
+# Per-user save and load functions
+# -------------------------
 def save_game_for_user(player_id, metrics, buildings, popups):
     conn = get_connection()
     if conn is None:
@@ -400,9 +415,9 @@ def load_game_for_user(player_id):
     conn.close()
     return metrics, buildings, popups
 
-# Methods for loading a saved game
-import json
-
+# ----------------------------------
+# Functions for loading a saved game
+# ----------------------------------
 def save_full_state(player_id, state_dict):
     conn = get_connection()
     if conn is None:

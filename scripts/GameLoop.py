@@ -2,10 +2,6 @@ import sys
 import pygame as py
 import random
 import os
-
-# from scripts.db import db_init
-#import tkinter as tk
-#from tkinter import filedialog
 from .config import *
 from .Button import Button
 from .agentsClass import Admin, Student, Player
@@ -16,14 +12,15 @@ import numpy as np
 from .GameState import GameState
 from .db import db_init
 
-# whenever you need to import an image, use this method (see line 149)
+# Whenever you need to import an image, use this method (see line 149)
 def resource_path(relative_path):
     """Gets the correct path for resources in dev or packaged mode."""
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return relative_path
 
-# main loop set up, with the screen, clock, and state manager created
+# Main loop set up
+# Screen, clock, and state manager created
 class Game:
     def __init__(self):
         py.init()
@@ -52,7 +49,7 @@ class Game:
             "In-Game Menu" : self.in_game_opt
         }
 
-    # main run loop, calling run methods from the current state
+    # Main run loop, calling run methods from the current state
     def run(self):
         while True:
 
@@ -71,7 +68,7 @@ class LoginRegisterScreen:
 
         self.username = ""
         self.password = ""
-        self.active_field = None  # "user" or "pass"
+        self.active_field = None  
         self.message = ""
 
         button_width = 250
@@ -129,9 +126,6 @@ class LoginRegisterScreen:
 
         self.draw_textbox(top_left_x, start_y, textbox_width, textbox_height, self.username, self.active_field=="user")
         self.draw_textbox(top_left_x, start_y + 60, textbox_width, textbox_height, "*"*len(self.password), self.active_field=="pass")
-
-        #self.draw_textbox(500, 200, 400, 40, self.username, self.active_field=="user")
-       # self.draw_textbox(500, 260, 400, 40, "*"*len(self.password), self.active_field=="pass")
 
         msg = self.font.render(self.message, True, (255,100,100))
         self.screen.blit(msg, (top_left_x, 320))
@@ -223,11 +217,6 @@ class LoginRegisterScreen:
         self.draw_textbox(top_left_x, start_y, textbox_width, textbox_height, self.username, self.active_field=="user")
         self.draw_textbox(top_left_x, start_y + 60, textbox_width, textbox_height, "*"*len(self.password), self.active_field=="pass")
 
-
-        # Textboxes
-        #self.draw_textbox(300, 180, 450, 45, self.username, self.active_field=="user")
-        #self.draw_textbox(300, 240, 450, 45, "*"*len(self.password), self.active_field=="pass")
-
         msg = self.font.render(self.message, True, (255,120,120))
         self.screen.blit(msg, (top_left_x, 300))
 
@@ -238,7 +227,7 @@ class LoginRegisterScreen:
             if event.type == py.QUIT:
                 py.quit(); sys.exit()
 
-            # focus fields
+            # Focus fields
             if event.type == py.MOUSEBUTTONDOWN:
                 mx, my = event.pos
                 if 300 <= mx <= 750:
@@ -249,7 +238,7 @@ class LoginRegisterScreen:
                     else:
                         self.active_field = None
 
-            # typing
+            # Typing
             if event.type == py.KEYDOWN and self.active_field:
                 if event.key == py.K_BACKSPACE:
                     if self.active_field == "user":
@@ -265,8 +254,8 @@ class LoginRegisterScreen:
             self.login_button.handle_event(event)
             self.register_button.handle_event(event)
 
-# first game menu screen
-# option to load or start a new game
+# First game menu screen
+# Option to load or start a new game
 class MainGameMenu():
     def __init__(self, screen, font, gameStateManager):
         self.screen = screen
@@ -275,13 +264,13 @@ class MainGameMenu():
 
         button_width = 300
         button_height = 90
-        spacing = 50  # space between buttons
+        spacing = 50  
         center_x = WINDOW_WIDTH // 2 - button_width // 2
         title_y = WINDOW_HEIGHT // 5
         start_y = WINDOW_HEIGHT // 2 - button_height - spacing // 2
         load_y = start_y + button_height + spacing
 
-        self.title_font = py.font.Font(None, 130)  # large clean title font
+        self.title_font = py.font.Font(None, 130) 
         self.title_y = title_y
 
         self.load_button = Button(dimensions=(center_x, start_y, button_width, button_height), # dimensions should be x,y,width,height
