@@ -80,7 +80,7 @@ class Menu:
 
         # The 'x' button to close menu
         if self.user_closable:
-            ## DONT HARD CODE THE VALS FIXME
+
             close_size = 20
             close_x = self.x + self.width - close_size - 10
             close_y = self.y + 10
@@ -107,7 +107,7 @@ class Menu:
                 current_line = test_line
 
             else:
-                # case 2: current line exists → push it and start new line
+                # case 2: current line exists - push it and start new line
                 if current_line:
                     lines.append(current_line)
                     current_line = word
@@ -131,39 +131,12 @@ class Menu:
             surface.blit(text_surface, (x, y))
             y += font.get_linesize()
     
-    '''
-    # so that the text wraps around and is not cut off if too long
-    def _wrap_text(self, surface, text, font, x, y, max_width):
-
-        space = ' '
-        words = text.split(space)
-        lines = [] # curating line by line to fit the button width
-        current_line = []
-        for word in words:
-            test = space.join(current_line + [word])
-
-            # if adding a word is within the maximum width, add it
-            if font.size(test)[0] < max_width:
-                current_line.append(word)
-            # if not, add a space and move to a new line
-            else: 
-                lines.append(space.join(current_line))
-                current_line = [word]
-        lines.append(space.join(current_line))
-
-        for line in lines:
-            text_surface = font.render(line, True, TEXT_COLOR)
-            surface.blit(source=text_surface, 
-                         dest=(x, y))
-            
-            y += font.get_linesize()
-            '''
     # so that the whole menu container shows up on the screen
     def draw(self, surface):
         
         # dim the main window
         overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 150)) ## DONT HARD CODE FIXME
+        overlay.fill((0, 0, 0, 150)) # later don't hardcode, enable the programmer to decide the color FIXME
         surface.blit(overlay, (0, 0))
 
         # draw the main menu window that pops up
@@ -180,7 +153,7 @@ class Menu:
 
         # draw the title text
         title_surface = self.title_font.render(self.title, True, TEXT_COLOR)
-        title_shape = title_surface.get_rect(centerx=self.rect.centerx, y=self.y + 30) # 30 is a placeholder FIXME
+        title_shape = title_surface.get_rect(centerx=self.rect.centerx, y=self.y + 30)
         surface.blit(title_surface, title_shape)
         
         # draw the main message text so that it doesn't overflow if the button is to
@@ -189,7 +162,7 @@ class Menu:
                         font=self.text_font, 
                         x=self.x + 30, 
                         y=self.y + 90, 
-                        max_width=self.width - 60) ## 30 pixel margin on both side dont hard code FIXME
+                        max_width=self.width - 60)
 
         # draw the buttons
         for button in self.buttons:
@@ -216,9 +189,9 @@ class MenuManager:
         if main_data is None:
             main_data = []
 
-        self.main_data = main_data          # Store the building definitions
-        self.building_levels = {}           # Clean storage for save/load
-        self.main_buttons = []              # Buttons created during setup
+        self.main_data = main_data  # Store the building definitions
+        self.building_levels = {}   # Clean storage for save/load
+        self.main_buttons = []      # Buttons created during setup
         self.active_menu = None         
 
     def main_setup(self, data):
@@ -228,7 +201,7 @@ class MenuManager:
         (text, callback, (w, h))
         (text, callback, (x, y, w, h))
         (text, callback, (x, y, w, h), image_path)
-        (None, callback, (x, y, w, h), image_path)  # image-only button
+        (None, callback, (x, y, w, h), image_path)
         """
 
         default_w, default_h = 250, 60

@@ -9,22 +9,14 @@ from .agentsClass import Admin, Student, Player
 from .MetricsClass import Metrics
 from .Popups import PopupEvent, minor_events, major_events
 from .menu import Menu, MenuManager
-import numpy as np
 from .GameState import GameState
 from .db import db_init
-
-# Whenever you need to import an image, use this method (see line 149)
-def resource_path(relative_path):
-    """Gets the correct path for resources in dev or packaged mode."""
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return relative_path
 
 # This class contains the main loop set up. It creates the screen, clock, and state manager
 class Game:
     def __init__(self):
         py.init()
-        self.screen = py.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)) #py.RESIZABLE - if we want to make it full screen, we have to resize EVERYTHING
+        self.screen = py.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)) #py.RESIZABLE - if we want to make it full screen, we have to resize everything
         self.clock = py.time.Clock()
 
         db_init()

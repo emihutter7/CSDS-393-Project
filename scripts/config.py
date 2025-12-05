@@ -23,7 +23,6 @@ BUTTON_COLOR = (180, 130, 90)     # medium brown for buttons
 BUTTON_HOVER = (200, 150, 100)    # lighter brown on hover
 TEXT_COLOR = (40, 30, 20)         # dark text
 FPS = 60
-# Other potential constants (e.g., FPS, game title, etc.) would go here.
 
 # Database dictionary 
 DATABASE_CONFIGURATION = {

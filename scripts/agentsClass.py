@@ -1,7 +1,4 @@
-import numpy as np
-import sys
 import pygame
-import random
 
 class Agent:
     def __init__(self, x, y, color, speed, path_end):
