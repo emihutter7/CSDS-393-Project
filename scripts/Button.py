@@ -1,14 +1,11 @@
-## imports
 import pygame
 import os
-
-## constants
 from .config import *
 
-## reusable standardized button class
+# Reusable standardized button class
 class Button:
 
-    ## button constructor
+    # Button constructor
     def __init__(self, dimensions, text, callback, font=None,
                  text_color=BLACK, 
                  base_color=PRIMARY_COLOR, 
@@ -18,7 +15,7 @@ class Button:
                  fontsize=24,
                  scale_to_fit=True):
         
-        self.rect = pygame.Rect(dimensions) # dimensions should be x,y,width,height
+        self.rect = pygame.Rect(dimensions) 
         self.text = text
         self.font = pygame.font.Font(None, fontsize)
         self.callback = callback
@@ -46,31 +43,28 @@ class Button:
                 self.image = None
 
 
-    ## draw the button so it appears on the screen
+    # Draw the button so it appears on the screen
     def draw(self, surface):
 
         if self.image:
-            # draw image directly
+            # Draw image directly
             surface.blit(self.image, self.rect)
             if self.is_hovered:
-                # slightly darken or highlight overlay
+                # Slightly darken or highlight overlay
                 overlay = pygame.Surface(self.rect.size, pygame.SRCALPHA)
                 overlay.fill((0, 0, 0, 60))  # 60 alpha = slight tint
                 surface.blit(overlay, self.rect.topleft)
         else:
-            # fallback: draw colored rectangle
+            # Fallback: draw colored rectangle
             self.current_color = self.hover_color if self.is_hovered else self.base_color
             pygame.draw.rect(surface, self.current_color, self.rect, border_radius=4)
             pygame.draw.rect(surface, self.border_color, self.rect, width=1, border_radius=4)
     
-        # text overlay
+        # Text overlay
         if self.text:
     
             padding = 0.5
             max_w = self.rect.width - padding * 2
-            #max_h = self.rect.height - padding * 2
-
-            #initial_size = self.font.get_height()
 
             wrapped_lines = self.wrap_text(
                 self.text,
@@ -78,30 +72,30 @@ class Button:
                 max_w
             )
 
-            # center vertically
+            # Center vertically
             line_height = self.font.get_linesize()
             total_height = len(wrapped_lines) * line_height
             y = self.rect.y + (self.rect.height - total_height) // 2
 
-            # draw each wrapped line centered
+            # Draw each wrapped line centered
             for line in wrapped_lines:
                 surf = self.font.render(line, True, self.text_color)
                 rect = surf.get_rect(center=(self.rect.centerx, y + line_height // 2))
                 surface.blit(surf, rect)
                 y += line_height
 
-    # handle all events for the button (so far just hover or click)
+    # Handle all events for the button (so far just hover or click)
     def handle_event(self, event):
         
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.rect.collidepoint(event.pos):
-            return self.callback() # defined callback when the button is clicked
+            return self.callback() # Defined callback when the button is clicked
             
         if event.type == pygame.MOUSEMOTION:
             self.is_hovered = self.rect.collidepoint(event.pos)
 
         return None
     
-    # same functionality as wrap text in menu
+    # Same functionality as wrap text in menu
     def wrap_text(self, text, font, max_width):
         words = text.split(" ")
         lines = []
@@ -121,7 +115,7 @@ class Button:
 
         return lines
     
-    # handles upgrade building event
+    # Handles upgrade building event
     def upgrade(self):
         if self.level < 3:
             self.level += 1

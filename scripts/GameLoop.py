@@ -1150,7 +1150,7 @@ class GameStateManager:
     def set_current_state(self, new_state):
         self.current_state = new_state
 
-
+# Main execution block
 if __name__ == '__main__':
     game = Game()
     game.run()

@@ -1,5 +1,6 @@
 import pygame
 
+# Represents agents (students and faculty) on the screen
 class Agent:
     def __init__(self, x, y, color, speed, path_end):
         self.x = x
@@ -14,10 +15,8 @@ class Agent:
         else:
             self.direction = -1
 
-    
+# Moves agents straight between start and end; reverse when hitting endpoints
     def move_along_path(self):
-        """Move straight between start and end; reverse when hitting endpoints."""
-
         sx, sy = self.path_start
         ex, ey = self.path_end
 
@@ -46,8 +45,9 @@ class Agent:
                 self.direction = 1
 
     def draw(self, window):
-        pass  # will be defined in subclasses
+        pass  # Defined in subclasses
 
+# Class creating students on the map represented by green triangles
 class Student(Agent):
     def draw(self, window):
         # Draw a small green triangle
@@ -58,6 +58,7 @@ class Student(Agent):
         ]
         pygame.draw.polygon(window, (0, 255, 0), points)
 
+# Class creating administration on the map represented by circles
 class Admin(Agent):
     def draw(self, window):
         pygame.draw.circle(window, (0, 0, 0), (int(self.x), int(self.y)), 6)
