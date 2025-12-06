@@ -9,7 +9,7 @@ def init_pygame():
     yield
     pygame.quit()
 
-def test_agent_move_and_reverse():
+def test_agent_move():
     agent = Agent(x=0, y=0, color=(255,0,0), speed=5, path_end=(10,0))
     start_direction = agent.direction
 
@@ -24,7 +24,7 @@ def test_agent_move_and_reverse():
         agent.move_along_path()
     assert agent.direction == start_direction  # reversed again
 
-def test_student_draw_calls_polygon(mocker):
+def test_student_draw_polygon(mocker):
     mock_polygon = mocker.patch("pygame.draw.polygon")
     s = Student(x=50, y=50, color=(0,255,0), speed=1, path_end=(100,50))
     mock_window = mock.MagicMock()
@@ -36,7 +36,7 @@ def test_student_draw_calls_polygon(mocker):
     assert args[1] == (0, 255, 0)  # color
     assert isinstance(args[2], list)  # points list
 
-def test_admin_draw_calls_circle(mocker):
+def test_admin_draw_circle(mocker):
     mock_circle = mocker.patch("pygame.draw.circle")
     a = Admin(x=100, y=200, color=(0,0,0), speed=1, path_end=(150,200))
     mock_window = mock.MagicMock()
@@ -47,7 +47,7 @@ def test_admin_draw_calls_circle(mocker):
     args, kwargs = mock_circle.call_args
     assert args[1] == (0, 0, 0)
 
-def test_player_draw_calls_rect(mocker):
+def test_player_draw_rect(mocker):
     mock_rect = mocker.patch("pygame.draw.rect")
     p = Player(x=10, y=20, color=(0,0,255))
     mock_window = mock.MagicMock()
