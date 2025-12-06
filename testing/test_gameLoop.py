@@ -27,7 +27,7 @@ def start_game(monkeypatch):
     return gl.StartGame(screen, font, manager)
 
 
-def test_game_run_processes_current_state_once(monkeypatch):
+def test_game_run_proc(monkeypatch):
     events = [py.event.Event(py.USEREVENT, {})]
     monkeypatch.setattr(py.event, "get", lambda: events)
 
@@ -42,13 +42,13 @@ def test_game_run_processes_current_state_once(monkeypatch):
         game.run()
 
 
-def test_start_game_show_building_menu_opens_menu(start_game):
+def test_building_opens(start_game):
     start_game.show_building_menu("Nord")
     assert start_game.menu_manager.active_menu is not None
     assert start_game.menu_manager.active_menu.title == "Nord Menu"
 
 
-def test_start_game_check_input_updates_directions(start_game):
+def test_update_directions(start_game):
     start_game.check_input(py.K_LEFT, True)
     start_game.check_input(py.K_RIGHT, True)
     start_game.check_input(py.K_UP, True)
@@ -63,7 +63,7 @@ def test_start_game_check_input_updates_directions(start_game):
     }
 
 
-def test_start_game_run_handles_events(monkeypatch, start_game):
+def test__start_handle_event(monkeypatch, start_game):
     events = [
         py.event.Event(py.KEYDOWN, {"key": py.K_LEFT}),
         py.event.Event(py.KEYUP, {"key": py.K_LEFT}),
@@ -86,7 +86,7 @@ def test_start_game_run_handles_events(monkeypatch, start_game):
     assert choice_tracker
 
 
-def test_start_game_run_handles_quit_event(monkeypatch, start_game):
+def test_start_quit_event(monkeypatch, start_game):
     events = [py.event.Event(py.QUIT, {})]
     monkeypatch.setattr(py.event, "get", lambda: events)
     monkeypatch.setattr(py, "quit", lambda: None)
@@ -104,14 +104,14 @@ def test_start_game_run_handles_quit_event(monkeypatch, start_game):
     assert exit_called
 
 
-def test_start_game_generate_tasks_even_semester(start_game):
+def test_generate_tasks(start_game):
     start_game.semester = 2
     start_game.tasks = []
     start_game.generate_tasks()
     assert len(start_game.tasks) == 2  # one minor + one major event
 
 
-def test_start_game_popup_flow_creates_buttons(start_game):
+def test_popup(start_game):
     event = PopupEvent(
         "Test Popup",
         "desc",
@@ -128,7 +128,7 @@ def test_start_game_popup_flow_creates_buttons(start_game):
     assert not start_game.tasks
 
 
-def test_load_game_run_handles_events(monkeypatch):
+def test_load_handle_event(monkeypatch):
     screen = py.Surface((gl.WINDOW_WIDTH, gl.WINDOW_HEIGHT))
     font = py.font.Font(None, 24)
     start = SimpleNamespace(player="value")
@@ -143,7 +143,7 @@ def test_load_game_run_handles_events(monkeypatch):
     loader.run()
 
 
-def test_load_game_run_handles_quit(monkeypatch):
+def test_load_quit(monkeypatch):
     screen = py.Surface((gl.WINDOW_WIDTH, gl.WINDOW_HEIGHT))
     font = py.font.Font(None, 24)
     start = SimpleNamespace(player="value")
@@ -162,7 +162,7 @@ def test_load_game_run_handles_quit(monkeypatch):
         loader.run()
 
 
-def test_in_game_menu_save_game_writes_json(monkeypatch, tmp_path):
+def test_save_game_json(monkeypatch, tmp_path):
     start = SimpleNamespace(
         player_x=1,
         player_y=2,
@@ -191,7 +191,7 @@ def test_in_game_menu_save_game_writes_json(monkeypatch, tmp_path):
     assert saved["students"] == 2
 
 
-def test_in_game_menu_run_handles_events(monkeypatch):
+def test_in_game_handle_event(monkeypatch):
     start = SimpleNamespace(
         player_x=0,
         player_y=0,
@@ -210,7 +210,7 @@ def test_in_game_menu_run_handles_events(monkeypatch):
     menu.run()
 
 
-def test_in_game_menu_run_handles_quit(monkeypatch):
+def test_in_game_quit(monkeypatch):
     start = SimpleNamespace(
         player_x=0,
         player_y=0,
@@ -233,7 +233,7 @@ def test_in_game_menu_run_handles_quit(monkeypatch):
         menu.run()
 
 
-def test_module_main_block_executes(monkeypatch):
+def test_module_main(monkeypatch):
     created = []
 
     class FakeGame:
